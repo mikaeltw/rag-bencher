@@ -1,0 +1,1 @@
+{"question": "What is LangChain?", "reference_answer": "LangChain is a framework for building applications with language models by chaining components like LLMs, retrievers, and tools."}\n{"question": "What does LangChain enable?", "reference_answer": "It enables context-aware applications using chains of LLMs, retrievers, and tools."}\n

@@ -1,0 +1,82 @@
+
+[build-system]
+requires = ["setuptools>=68", "wheel", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rag-bench"
+dynamic = ["version"]
+description = "Reproducible RAG baselines and evaluations with LangChain"
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+license = {text = "MIT"}
+authors = [{name = "Mikael Twengström"}]
+
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+
+  "langchain>=0.2.0",
+  "langchain-community>=0.2.0",
+  "langchain-openai>=0.1.0",
+  "faiss-cpu>=1.7.4",
+  "sentence-transformers>=2.7.0",
+  "pydantic>=2.7.0",
+  "pyyaml>=6.0.1",
+  "rich>=13.7.0",
+  "tqdm>=4.66.0"
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4.0", "ruff>=0.5.0", "ipykernel>=6.29.0", "black>=24.4.0", "isort>=5.13.0", "flake8>=7.0.0"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.uv]
+python-version = "3.11"
+
+
+[tool.black]
+line-length = 120
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.flake8]
+max-line-length = 120
+extend-ignore = ["E203", "W503"]
+
+
+[project.scripts]
+rag-bench = "rag_bench.cli:main"
+rag-bench-bench = "rag_bench.bench_cli:main"
+rag-bench-many = "rag_bench.bench_many_cli:main"
+
+
+[tool.setuptools_scm]
+version_scheme = "no-guess-dev"
+local_scheme = "node-and-date"
+fallback_version = "0.0.0"
+
+
+[project.urls]
+Homepage = "https://github.com/mikaeltw/rag-bench"
+Issues = "https://github.com/mikaeltw/rag-bench/issues"
+
+
+[tool.setuptools]
+include-package-data = true
+
+
+[tool.setuptools.package-data]
+"rag_bench" = ["resources/**"]

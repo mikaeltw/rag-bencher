@@ -1,0 +1,4 @@
+
+LangChain is a framework for developing applications powered by language models.
+It enables chaining of components like LLMs, retrievers, and tools to build context-aware apps.
+This small sample exists so rag-bench runs out-of-the-box without extra data.

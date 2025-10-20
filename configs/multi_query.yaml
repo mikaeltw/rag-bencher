@@ -1,0 +1,10 @@
+
+model:
+  name: ${MODEL_NAME:-gpt-4o-mini}
+retriever:
+  k: 4
+data:
+  paths:
+    - examples/data/sample.txt
+multi_query:
+  n_queries: 3
