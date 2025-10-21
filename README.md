@@ -65,3 +65,24 @@ pip install "rag-bench[azure]"  # for Azure AI Search
 pip install "rag-bench[aws]"    # for OpenSearch
 pip install "rag-bench[gcp]"    # for Matching Engine
 ```
+
+## 🧪 Continuous Integration
+
+![CI](https://github.com/your-org-or-user/rag-bench/actions/workflows/ci.yml/badge.svg)
+![Nightly Cloud](https://github.com/your-org-or-user/rag-bench/actions/workflows/live-cloud.yml/badge.svg)
+![GPU Tests](https://github.com/your-org-or-user/rag-bench/actions/workflows/gpu.yml/badge.svg)
+
+CI runs:
+- ✅ Unit & Offline tests on every push / PR
+- ☁️ Cloud/vector smokes on push — **allowed to fail**
+- ⚙️ Nightly deeper tests in `.github/workflows/live-cloud.yml`
+- 🧩 GPU tests on self-hosted runners via `.github/workflows/gpu.yml`
+
+### 🔐 Secrets & Variables
+
+| Job | Required Secrets / Variables | Purpose |
+|------|-------------------------------|----------|
+| **cloud-gcp** | `GOOGLE_CREDENTIALS_JSON`, `GCP_PROJECT`, `VERTEX_LOCATION`, `VERTEX_CHAT_MODEL` | Vertex AI chat smoke test |
+| **cloud-aws** | `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `BEDROCK_MODEL` | AWS Bedrock chat smoke test |
+| **cloud-azure** | `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_DEPLOYMENT`, `AZURE_OPENAI_API_VERSION` | Azure OpenAI chat smoke test |
+| **vector-smokes** | `AZURE_SEARCH_ENDPOINT`, `AZURE_SEARCH_INDEX`, `OPENSEARCH_HOST`, `OPENSEARCH_INDEX`, `ME_INDEX_ID`, `ME_ENDPOINT_ID`, `VERTEX_LOCATION` | Vector store backends |
