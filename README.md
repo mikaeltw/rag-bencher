@@ -68,9 +68,9 @@ pip install "rag-bench[gcp]"    # for Matching Engine
 
 ## 🧪 Continuous Integration
 
-![CI](https://github.com/your-org-or-user/rag-bench/actions/workflows/ci.yml/badge.svg)
-![Nightly Cloud](https://github.com/your-org-or-user/rag-bench/actions/workflows/live-cloud.yml/badge.svg)
-![GPU Tests](https://github.com/your-org-or-user/rag-bench/actions/workflows/gpu.yml/badge.svg)
+![CI](https://github.com/mikaeltw/rag-bench/actions/workflows/ci.yml/badge.svg)
+![Nightly Cloud](https://github.com/mikaeltw/rag-bench/actions/workflows/live-cloud.yml/badge.svg)
+![GPU Tests](https://github.com/mikaeltw/rag-bench/actions/workflows/gpu.yml/badge.svg)
 
 CI runs:
 - ✅ Unit & Offline tests on every push / PR

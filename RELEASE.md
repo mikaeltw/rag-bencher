@@ -1,1 +1,1 @@
-See GitHub Actions workflows publish.yml and publish-testpypi.yml.
+See GitHub Actions workflows publish-pypi.yml and publish-testpypi.yml.
