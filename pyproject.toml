@@ -55,6 +55,9 @@ skip_gitignore = true
 max-line-length = "120"
 extend-ignore = "E203,W503"
 extend-exclude = ".venv,venv,**/.venv,**/venv,build,dist,.git,__pycache__"
+select = ["C", "E", "F", "W", "B", "B9", "D", "ANN", "C4"]
+ignore = ["D100", "D101", "D102", "D103", "D104", "D107", "ANN101", "ANN102", "ANN204", "ANN401"]
+docstring-convention = "google"
 
 [tool.mypy]
 python_version = "3.12"

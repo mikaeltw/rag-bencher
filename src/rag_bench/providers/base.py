@@ -2,11 +2,13 @@ from typing import Any, Mapping, Optional, Protocol
 
 
 class ChatAdapter(Protocol):
-    def to_langchain(self) -> Any: ...
+    def to_langchain(self) -> Any:
+        ...
 
 
 class EmbeddingsAdapter(Protocol):
-    def to_langchain(self) -> Any: ...
+    def to_langchain(self) -> Any:
+        ...
 
 
 def build_chat_adapter(cfg: Mapping[str, Any] | None) -> Optional[ChatAdapter]:

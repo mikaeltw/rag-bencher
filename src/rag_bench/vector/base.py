@@ -5,7 +5,8 @@ from langchain_core.retrievers import BaseRetriever
 
 
 class VectorBackend(Protocol):
-    def make_retriever(self, *, docs: Optional[List[Document]], embeddings: Any, k: int) -> BaseRetriever: ...
+    def make_retriever(self, *, docs: Optional[List[Document]], embeddings: Any, k: int) -> BaseRetriever:
+        ...
 
 
 def build_vector_backend(cfg: Dict[str, Any] | None) -> Optional[VectorBackend]:

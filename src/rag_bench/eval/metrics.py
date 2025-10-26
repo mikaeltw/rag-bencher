@@ -36,8 +36,8 @@ def bow_cosine(p: str, r: str) -> float:
 
 
 def context_recall(context: str, reference: str) -> float:
-    """
-    Simple token-level recall of reference content in the provided context.
+    """Simple token-level recall of reference content in the provided context.
+
     Returns the fraction of unique tokens from `reference` that appear in `context`.
     Range: [0.0, 1.0].
     """

@@ -13,8 +13,8 @@ def make_hf_embeddings(
     model_kwargs: Optional[Dict[str, Any]] = None,
     encode_kwargs: Optional[Dict[str, Any]] = None,
 ) -> "HuggingFaceEmbeddings":
-    """
-    Create a HuggingFaceEmbeddings with device already set from global policy.
+    """Create a HuggingFaceEmbeddings with device already set from global policy.
+
     Usage everywhere:
         from rag_bench.utils.factories import make_hf_embeddings
         embed = make_hf_embeddings()
