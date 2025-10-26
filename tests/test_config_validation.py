@@ -7,7 +7,7 @@ import pytest
 from rag_bench.config import load_config
 
 
-def write_tmp(text: str):
+def write_tmp(text: str) -> str:
     fd = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml", mode="w", encoding="utf-8")
     fd.write(text)
     fd.close()

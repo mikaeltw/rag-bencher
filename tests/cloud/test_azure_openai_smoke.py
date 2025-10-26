@@ -1,6 +1,7 @@
 import os
 
 import pytest
+from langchain_core.messages import BaseMessage
 
 pytestmark = pytest.mark.cloud
 RUN = os.getenv("RUN_AZURE_SMOKE") == "true"
@@ -19,4 +20,10 @@ def test_azure_openai_chat_smoke() -> None:
         temperature=0,
     )
     out = llm.invoke("Say 'pong'")
-    assert isinstance(out, str) and "pong" in out.lower()
+    assert isinstance(out, BaseMessage)
+    raw = out.content
+    if isinstance(raw, str):
+        content = raw
+    else:
+        content = " ".join(str(part) for part in raw)
+    assert "pong" in content.lower()
