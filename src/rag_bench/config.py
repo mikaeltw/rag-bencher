@@ -23,6 +23,7 @@ class DataCfg(BaseModel):
 class ProviderModelCfg(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     name: str
+    region: str | None = None
     chat: Dict[str, Any] | None = None
     embeddings: Dict[str, Any] | None = None
 
