@@ -1,64 +1,18 @@
 import argparse
 import glob
 import json
-import os
 from pathlib import Path
 from statistics import mean
-from typing import Any, Callable, Dict, Iterator, Mapping, Tuple
+from typing import Any, Dict, Iterator
 
-import yaml
-from langchain_core.documents import Document
-from langchain_core.runnables import RunnableSerializable
 from rich.console import Console
 
-from rag_bench.config import BenchConfig, load_config
+from rag_bench.config import load_config
 from rag_bench.eval.dataset_loader import load_texts_as_documents
 from rag_bench.eval.metrics import bow_cosine, context_recall, lexical_f1
-from rag_bench.pipelines import hyde as hy
-from rag_bench.pipelines import multi_query as mq
-from rag_bench.pipelines import naive_rag
-from rag_bench.pipelines import rerank as rr
-from rag_bench.providers.base import build_chat_adapter, build_embeddings_adapter
+from rag_bench.pipelines.selector import PipelineSelection, select_pipeline
 
 console = Console()
-
-
-def choose(
-    cfg_path: str, docs: list[Document]
-) -> Tuple[str, RunnableSerializable[str, str], Callable[[], Mapping[str, Any]], BenchConfig]:
-    cfg = load_config(cfg_path)
-    provider_cfg = cfg.model_dump().get("provider")
-    chat_adapter = build_chat_adapter(provider_cfg) if getattr(cfg, "provider", None) else None
-    emb_adapter = build_embeddings_adapter(provider_cfg) if getattr(cfg, "provider", None) else None
-    llm_obj = chat_adapter.to_langchain() if chat_adapter else None
-    emb_obj = emb_adapter.to_langchain() if emb_adapter else None
-
-    with open(cfg_path, "r", encoding="utf-8") as f:
-        raw = yaml.safe_load(os.path.expandvars(f.read())) or {}
-    if "rerank" in raw:
-        rrc = raw["rerank"]
-        chain, debug = rr.build_chain(
-            docs,
-            model=cfg.model.name,
-            k=cfg.retriever.k,
-            rerank_top_k=int(rrc.get("top_k", 4)),
-            method=str(rrc.get("method", "cosine")),
-            cross_encoder_model=str(rrc.get("cross_encoder_model", "BAAI/bge-reranker-base")),
-            llm=llm_obj,
-            embeddings=emb_obj,
-        )
-        return "rerank", chain, debug, cfg
-    if "multi_query" in raw:
-        n = int(raw["multi_query"].get("n_queries", 3))
-        chain, debug = mq.build_chain(
-            docs, model=cfg.model.name, k=cfg.retriever.k, n_queries=n, llm=llm_obj, embeddings=emb_obj
-        )
-        return "multi_query", chain, debug, cfg
-    if "hyde" in raw:
-        chain, debug = hy.build_chain(docs, model=cfg.model.name, k=cfg.retriever.k, llm=llm_obj, embeddings=emb_obj)
-        return "hyde", chain, debug, cfg
-    chain, debug = naive_rag.build_chain(docs, model=cfg.model.name, k=cfg.retriever.k, llm=llm_obj, embeddings=emb_obj)
-    return "naive", chain, debug, cfg
 
 
 def main() -> None:
@@ -78,7 +32,10 @@ def main() -> None:
 
     results: list[Dict[str, Any]] = []
     for p in sorted(glob.glob(args.configs)):
-        pid, chain, debug, _ = choose(p, docs)
+        selection: PipelineSelection = select_pipeline(p, docs)
+        pid = selection.pipeline_id
+        chain = selection.chain
+        debug = selection.debug
         rows: list[Dict[str, float]] = []
         for ex in iter_jsonl(args.qa):
             q = ex["question"]
