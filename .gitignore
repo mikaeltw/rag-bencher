@@ -1,7 +1,11 @@
-venv/
-.venv/
+venv
+.venv
 .ipynb
 __pycache__
 *.egg-info
 .ragbench_cache
 .mypy_cache
+.tox
+.coverage
+build/
+coverage.xml

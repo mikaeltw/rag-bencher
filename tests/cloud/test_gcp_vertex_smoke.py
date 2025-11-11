@@ -17,4 +17,5 @@ def test_vertex_chat_smoke() -> None:
         temperature=0,
     )
     out = llm.invoke("Say 'pong'")
-    assert isinstance(out, str) and "pong" in out.lower()
+    text = str(getattr(out, "content", out))
+    assert "pong" in text.lower()
