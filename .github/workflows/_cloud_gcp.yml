@@ -1,0 +1,60 @@
+
+
+  cloud-gcp:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    if: github.event_name != 'pull_request' && (secrets.GCP_PROJECT != '' || vars.GCP_PROJECT != '')
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Install
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[gcp]"
+      - name: ADC auth
+        if: env.GOOGLE_CREDENTIALS_JSON != ''
+        run: |
+          echo "$GOOGLE_CREDENTIALS_JSON" > $HOME/gcp.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcp.json" >> $GITHUB_ENV
+        env:
+          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+      - name: GCP smoke
+        env:
+          RUN_GCP_SMOKE: "true"
+          GCP_PROJECT: ${{ secrets.GCP_PROJECT || vars.GCP_PROJECT }}
+          VERTEX_LOCATION: ${{ secrets.VERTEX_LOCATION || vars.VERTEX_LOCATION }}
+          VERTEX_CHAT_MODEL: ${{ secrets.VERTEX_CHAT_MODEL || vars.VERTEX_CHAT_MODEL }}
+        run: pytest -q -m cloud tests/cloud/test_gcp_vertex_smoke.py
+      - name: Save coverage data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ github.job }}
+          path: |
+            .coverage*
+
+
+  vector-smokes:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    if: github.event_name != 'pull_request'
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Install providers
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[providers]"
+
+      - name: Matching Engine smoke
+        env:
+          RUN_ME_SMOKE: "true"
+          GCP_PROJECT: ${{ secrets.GCP_PROJECT || vars.GCP_PROJECT }}
+          ME_INDEX_ID: ${{ secrets.ME_INDEX_ID || vars.ME_INDEX_ID }}
+          ME_ENDPOINT_ID: ${{ secrets.ME_ENDPOINT_ID || vars.ME_ENDPOINT_ID }}
+          ME_LOCATION: ${{ secrets.VERTEX_LOCATION || vars.VERTEX_LOCATION }}
+        run: pytest -q -m cloud tests/cloud/test_vector_backends_smoke.py::test_matching_engine_smoke || true

@@ -8,7 +8,7 @@ name = "rag-bench"
 dynamic = ["version"]
 description = "Reproducible RAG baselines and evaluations with LangChain"
 readme = "README.md"
-requires-python = ">=3.11,<3.13"
+requires-python = ">=3.12,<=3.14"
 license = "MIT"                         # e.g. "Apache-2.0", "BSD-3-Clause", or a compound expression
 license-files = ["LICENSE"]
 authors = [{name = "Mikael Twengström"}]
@@ -16,9 +16,10 @@ authors = [{name = "Mikael Twengström"}]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
@@ -36,7 +37,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7.4.0", "pytest-cov>=4.1.0", "black>=24.4.0", "isort>=5.13.0", "flake8>=7.3.0", "flake8-pyproject>=1.2.3", "mypy>=1.18.2", "types-PyYAML>=6.0.12.20250915", "types-requests>=2.32.4.20250913", "types-setuptools>=80.9.0.20250822", "flake8-bugbear>=25.10.21", "flake8-comprehensions>=3.17.0", "flake8-annotations>=3.2.0", "flake8-docstrings>=1.7.0", "build", "twine"]
+dev = ["tox>=4.32.0", "pytest>=7.4.0", "pytest-cov>=4.1.0", "black>=24.4.0", "isort>=5.13.0", "flake8>=7.3.0", "flake8-pyproject>=1.2.3", "mypy>=1.18.2", "types-PyYAML>=6.0.12.20250915", "types-requests>=2.32.4.20250913", "types-setuptools>=80.9.0.20250822", "flake8-bugbear>=25.10.21", "flake8-comprehensions>=3.17.0", "flake8-annotations>=3.2.0", "flake8-docstrings>=1.7.0", "build", "twine"]
 gcp = ["langchain-google-vertexai>=0.1.0", "google-auth>=2.30.0"]
 aws = ["langchain-aws>=0.1.0", "boto3>=1.34.0", "botocore>=1.34.0", "opensearch-py>=2.6.0"]
 azure = ["langchain-openai>=0.1.0", "azure-identity>=1.17.0", "azure-search-documents>=11.5.1"]
@@ -74,6 +75,46 @@ disallow_subclassing_any = false
 show_error_codes = true
 pretty = true
 
+[tool.pytest.ini_options]
+markers = [
+  "unit: fast unit tests",
+  "offline: no network",
+  "cloud: live cloud smoke tests",
+  "gpu: requires CUDA",
+  "vector: live cloud vector smoke tests"
+]
+addopts = [
+  "--cov=rag_bench",
+  "--cov-branch",
+  "--no-cov-on-fail",
+  "--cov-report=xml:coverage.xml",
+  "-ra",
+  "-Wall",
+  "-Werror",
+]
+
+[tool.coverage.run]
+source = ["."]
+branch = true
+parallel = true               # write .coverage.* files for later combine
+omit = [
+  "*/tests/*",
+  "*/.venv/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 100.0            # <-- enforce 100% here
+
+# Normalize paths from different runners (Linux/macOS, tox, Actions)
+[tool.coverage.paths]
+source = [
+  "src/rag_bench",
+  "*/work/*/rag-bench/src/rag_bench",
+  "*/workspace/*/rag-bench/src/rag_bench",
+]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["rag_bench*"]
@@ -82,3 +123,50 @@ include = ["rag_bench*"]
 fallback_version = "0.0.0"
 # version_scheme = "post-release"
 # local_scheme = "node-and-date"
+
+[tool.tox]
+requires = ["tox>=4.14", "tox-uv>=1.10"]  # uv-backed env creation & installs
+env_list = ["py312", "py313", "py314", "lint", "typecheck"]
+
+[tool.tox.env_run_base]
+# Common to all envs
+set_env = { RAG_BENCH_DEVICE = "cpu", CUDA_VISIBLE_DEVICES = "" }
+commands_pre = [["python", "-V"]]
+
+# --- Test envs (matrix) ---
+[[tool.tox.envs.py311]]
+package = "editable"
+deps = [".[dev]"]
+commands = [["pytest", "-q", "-m", "unit or offline"]]
+
+[[tool.tox.envs.py312]]
+package = "editable"
+deps = [".[dev]"]
+commands = [["pytest", "-q", "-m", "unit or offline"]]
+
+[[tool.tox.envs.py313]]
+package = "editable"
+deps = [".[dev]"]
+commands = [["pytest", "-q", "-m", "unit or offline"]]
+
+# --- Lint env ---
+[tool.tox.envs.lint]
+package = "skip"
+deps = [".[dev]"]
+commands = [
+  ["flake8"],
+  ["isort", "--check-only", "."],
+  ["black", "--check", "."]
+]
+
+# --- Type check env ---
+[tool.tox.envs.typecheck]
+package = "skip"
+deps = [".[dev]"]
+commands = [["mypy", "."]]
+
+# --- GPU env ---
+[tool.tox.envs.gpu]
+package = "skip"
+deps = [".[dev]"]
+commands = [["pytest", "-q", "-m", "gpu"]]

@@ -1,0 +1,54 @@
+
+
+
+
+  cloud-azure:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    if: github.event_name != 'pull_request' && (secrets.AZURE_OPENAI_ENDPOINT != '' || vars.AZURE_OPENAI_ENDPOINT != '')
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Install
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[azure]"
+      - name: Azure smoke
+        env:
+          RUN_AZURE_SMOKE: "true"
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT || vars.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          AZURE_OPENAI_DEPLOYMENT: ${{ secrets.AZURE_OPENAI_DEPLOYMENT || vars.AZURE_OPENAI_DEPLOYMENT }}
+          AZURE_OPENAI_API_VERSION: ${{ secrets.AZURE_OPENAI_API_VERSION || vars.AZURE_OPENAI_API_VERSION }}
+        run: pytest -q -m cloud tests/cloud/test_azure_openai_smoke.py
+
+      - name: Save coverage data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ github.job }}
+          path: |
+            .coverage*
+
+  vector-smokes:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    if: github.event_name != 'pull_request'
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Install providers
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[providers]"
+
+      - name: Azure AI Search smoke
+        env:
+          RUN_AZURE_SEARCH_SMOKE: "true"
+          AZURE_SEARCH_ENDPOINT: ${{ secrets.AZURE_SEARCH_ENDPOINT || vars.AZURE_SEARCH_ENDPOINT }}
+          AZURE_SEARCH_INDEX: ${{ secrets.AZURE_SEARCH_INDEX || vars.AZURE_SEARCH_INDEX }}
+        run: pytest -q -m cloud tests/cloud/test_vector_backends_smoke.py::test_azure_ai_search_smoke || true

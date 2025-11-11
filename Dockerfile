@@ -1,5 +1,4 @@
-
-FROM python:3.11-slim
+FROM python:3.12slim
 WORKDIR /app
 COPY . /app
 RUN pip install -U pip && pip install -e ".[dev]"

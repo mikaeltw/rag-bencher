@@ -4,7 +4,7 @@
 Thanks for considering a contribution!
 
 ## Setup
-- Use Python 3.11 (we recommend `uv`)
+- Use Python 3.12 (we recommend `uv`)
 - `uv venv && source .venv/bin/activate && uv sync`
 - `make fmt && make lint && make test`
 
