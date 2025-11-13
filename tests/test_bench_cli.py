@@ -113,3 +113,32 @@ def test_bench_cli_uses_candidates_when_no_retrieved(monkeypatch: pytest.MonkeyP
     bench_cli.main()
 
     assert chain.calls == ["Q1"]
+
+
+def test_bench_cli_no_debug_context(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    qa_path = tmp_path / "qa.jsonl"
+    qa_path.write_text('{"question":"Q1","reference_answer":"Ref"}\n', encoding="utf-8")
+    cfg = _dummy_config()
+    chain = DummyChain()
+    selection = SimpleNamespace(
+        pipeline_id="naive",
+        chain=chain,
+        debug=lambda: {"pipeline": "naive"},
+        config=cfg,
+    )
+    reports: list[Any] = []
+    monkeypatch.setattr(bench_cli, "load_config", lambda path: cfg)
+    monkeypatch.setattr(bench_cli, "load_texts_as_documents", lambda _: ["doc"])
+    monkeypatch.setattr(bench_cli, "select_pipeline", lambda *_args, **_kwargs: selection)
+
+    def capture_report(**kwargs: Any) -> str:
+        reports.append(kwargs)
+        return "reports/report.html"
+
+    monkeypatch.setattr(bench_cli, "write_simple_report", capture_report)
+    monkeypatch.setattr(sys, "argv", ["bench_cli", "--config", "cfg.yaml", "--qa", str(qa_path)])
+
+    bench_cli.main()
+
+    assert chain.calls == ["Q1"]
+    assert reports, "report should be generated even without context"

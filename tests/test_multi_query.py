@@ -17,3 +17,9 @@ def test_dedupe_queries_limits_and_uniqueness() -> None:
     assert merged == ["base", "extra"]
     merged_many = multi_query._dedupe_queries("base", ["one", "two", "three"], 5)
     assert merged_many[:3] == ["base", "one", "two"]
+
+
+def test_fallback_queries_truncates() -> None:
+    queries = multi_query._fallback_queries("question", 3)
+    assert len(queries) == 3
+    assert queries[0] == "question"

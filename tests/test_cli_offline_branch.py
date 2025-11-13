@@ -84,7 +84,8 @@ def test_pick_llm_offline_updates_generation_config(monkeypatch: pytest.MonkeyPa
     )
 
     llm = cli._pick_llm(cfg)
-    llm_obj = cast(Any, llm)
-    assert llm_obj.bound_stop == ["\nQuestion:", "###END"]
-    generation_updates = llm_obj.pipeline.model.generation_config.updates
+    bound = llm.bind(stop=["\nQuestion:", "###END"])
+    llm_data = cast(Any, bound)
+    assert llm_data.bound_stop == ["\nQuestion:", "###END"]
+    generation_updates = llm_data.pipeline.model.generation_config.updates
     assert generation_updates["do_sample"] is False

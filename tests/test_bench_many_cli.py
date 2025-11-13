@@ -114,3 +114,27 @@ def test_bench_many_cli_handles_candidate_debug(monkeypatch: pytest.MonkeyPatch,
     bench_many_cli.main()
 
     assert chain.calls == ["Q"]
+
+
+def test_bench_many_cli_handles_empty_debug(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.chdir(tmp_path)
+    qa_path = tmp_path / "qa.jsonl"
+    qa_path.write_text('{"question":"Q","reference_answer":"R"}\n', encoding="utf-8")
+    cfg = SimpleNamespace(
+        model=SimpleNamespace(name="demo-model"),
+        data=SimpleNamespace(paths=["doc.txt"]),
+        retriever=SimpleNamespace(k=2),
+        model_dump=lambda: {"model": {"name": "demo-model"}},
+    )
+    config_path = tmp_path / "cfg.yaml"
+    config_path.write_text("{}", encoding="utf-8")
+    chain = DummyChain("none")
+    selection = SimpleNamespace(pipeline_id="pipe-none", chain=chain, debug=lambda: {"pipeline": "none"}, config=cfg)
+    monkeypatch.setattr(bench_many_cli, "load_config", lambda path: cfg)
+    monkeypatch.setattr(bench_many_cli, "load_texts_as_documents", lambda _: ["doc"])
+    monkeypatch.setattr(bench_many_cli, "select_pipeline", lambda *_args, **_kwargs: selection)
+    monkeypatch.setattr(sys, "argv", ["bench_many_cli", "--configs", str(config_path), "--qa", str(qa_path)])
+
+    bench_many_cli.main()
+
+    assert chain.calls == ["Q"]
