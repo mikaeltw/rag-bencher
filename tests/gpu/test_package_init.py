@@ -43,3 +43,15 @@ def test_version_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(importlib.metadata, "version", missing)
     _reload_rag_bench()
     assert rag_bench.__version__ == "0.0.0"
+
+
+def test_reload_appends_load_config(monkeypatch: pytest.MonkeyPatch) -> None:
+    import sys
+
+    original_cfg = sys.modules.get("rag_bench.config")
+    monkeypatch.delitem(sys.modules, "rag_bench.config", raising=False)
+    module = importlib.reload(rag_bench)
+    assert "load_config" in module.__all__
+    if original_cfg is not None:
+        monkeypatch.setitem(sys.modules, "rag_bench.config", original_cfg)
+    importlib.reload(rag_bench)
