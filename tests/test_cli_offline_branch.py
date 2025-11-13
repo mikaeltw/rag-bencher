@@ -9,6 +9,8 @@ import pytest
 
 from rag_bench import cli
 
+pytestmark = [pytest.mark.unit, pytest.mark.offline]
+
 
 def test_pick_llm_offline_updates_generation_config(monkeypatch: pytest.MonkeyPatch) -> None:
     cfg = cast(
@@ -84,8 +86,7 @@ def test_pick_llm_offline_updates_generation_config(monkeypatch: pytest.MonkeyPa
     )
 
     llm = cli._pick_llm(cfg)
-    bound = llm.bind(stop=["\nQuestion:", "###END"])
-    llm_data = cast(Any, bound)
+    llm_data = cast(Any, llm)
     assert llm_data.bound_stop == ["\nQuestion:", "###END"]
     generation_updates = llm_data.pipeline.model.generation_config.updates
     assert generation_updates["do_sample"] is False

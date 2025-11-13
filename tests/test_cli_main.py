@@ -90,6 +90,22 @@ def test_cli_main_runs_chain_on_cache_miss(monkeypatch: pytest.MonkeyPatch) -> N
     assert chain.calls and chain.calls[0]["question"] == "What is RAG?"
 
 
+def test_cli_main_leaves_device_env_when_auto(monkeypatch: pytest.MonkeyPatch) -> None:
+    cfg = _make_cfg()
+    cfg.runtime.device = "auto"
+    docs = [Document(page_content="doc", metadata={"source": "doc.txt"})]
+    chain = DummyChain()
+    _patch_common(monkeypatch, cfg, docs, chain)
+    monkeypatch.setattr(sys, "argv", ["rag-bench", "--config", "cfg.yaml", "--question", "Auto?"])
+    monkeypatch.delenv("RAG_BENCH_DEVICE", raising=False)
+    monkeypatch.delenv("CUDA_VISIBLE_DEVICES", raising=False)
+
+    cli.main()
+
+    assert os.environ.get("RAG_BENCH_DEVICE") is None
+    assert os.environ.get("CUDA_VISIBLE_DEVICES") is None
+
+
 def test_cli_main_returns_cached_answer(monkeypatch: pytest.MonkeyPatch) -> None:
     cfg = _make_cfg()
     docs = [Document(page_content="doc", metadata={"source": "doc.txt"})]
@@ -189,6 +205,130 @@ def test_pick_llm_offline_builds_hf_pipeline(monkeypatch: pytest.MonkeyPatch) ->
     assert llm_obj.bound_stop == ["\nQuestion:", "###END"]
     assert calls["tokenizer_model"] == "google/flan-t5-small"
     assert calls["model_id"] == "google/flan-t5-small"
+
+
+def test_pick_llm_offline_preserves_existing_pad_token(monkeypatch: pytest.MonkeyPatch) -> None:
+    cfg = _make_cfg()
+    cfg.runtime.offline = True
+    tracker: dict[str, Any] = {}
+
+    class DummyTokenizer:
+        pad_token_id = 99
+        eos_token_id = 7
+
+        @classmethod
+        def from_pretrained(cls, model_id: str) -> "DummyTokenizer":
+            tracker["tokenizer_model"] = model_id
+            return cls()
+
+    class DummyGenerationConfig:
+        def __init__(self) -> None:
+            self.params: dict[str, Any] = {}
+
+        def update(self, **kwargs: Any) -> None:
+            self.params.update(kwargs)
+
+    class DummyModel:
+        def __init__(self) -> None:
+            self.generation_config = DummyGenerationConfig()
+
+    class AutoModel:
+        @classmethod
+        def from_pretrained(cls, model_id: str) -> DummyModel:
+            tracker["model_id"] = model_id
+            return DummyModel()
+
+    class DummyPipeline:
+        __slots__ = ("model", "tokenizer")
+
+        def __init__(self, model: DummyModel, tokenizer: DummyTokenizer) -> None:
+            self.model = model
+            self.tokenizer = tokenizer
+
+    def fake_pipeline(**kwargs: Any) -> DummyPipeline:
+        tracker["pipeline_kwargs"] = kwargs
+        return DummyPipeline(kwargs["model"], kwargs["tokenizer"])
+
+    class DummyHFPipeline:
+        def __init__(self, pipeline: DummyPipeline) -> None:
+            self.pipeline = pipeline
+
+        def bind(self, stop: List[str]) -> Any:
+            return SimpleNamespace(bound_stop=stop, pipeline=self.pipeline)
+
+    monkeypatch.setitem(
+        sys.modules,
+        "transformers",
+        SimpleNamespace(
+            AutoModelForSeq2SeqLM=AutoModel,
+            AutoTokenizer=DummyTokenizer,
+            pipeline=fake_pipeline,
+        ),
+    )
+    monkeypatch.setitem(sys.modules, "langchain_huggingface", SimpleNamespace(HuggingFacePipeline=DummyHFPipeline))
+
+    llm = cli._pick_llm(cfg)
+    llm_obj = cast(Any, llm)
+    assert llm_obj.bound_stop == ["\nQuestion:", "###END"]
+    # Existing pad token should remain untouched because it was already set.
+    assert llm_obj.pipeline.tokenizer.pad_token_id == 99
+    assert llm_obj.pipeline.tokenizer.eos_token_id == 7
+
+
+def test_pick_llm_offline_handles_missing_generation_config(monkeypatch: pytest.MonkeyPatch) -> None:
+    cfg = _make_cfg()
+    cfg.runtime.offline = True
+
+    class DummyTokenizer:
+        pad_token_id = None
+        eos_token_id = 5
+
+        @classmethod
+        def from_pretrained(cls, model_id: str) -> "DummyTokenizer":
+            return cls()
+
+    class DummyModel:
+        def __init__(self) -> None:
+            # Intentionally no generation_config attribute
+            self.model_id = "dummy"
+
+    class AutoModel:
+        @classmethod
+        def from_pretrained(cls, model_id: str) -> DummyModel:
+            return DummyModel()
+
+    class DummyPipeline:
+        __slots__ = ("model",)
+
+        def __init__(self, model: DummyModel) -> None:
+            self.model = model
+
+    def fake_pipeline(**kwargs: Any) -> DummyPipeline:
+        return DummyPipeline(kwargs["model"])
+
+    class DummyHFPipeline:
+        def __init__(self, pipeline: DummyPipeline) -> None:
+            self.pipeline = pipeline
+
+        def bind(self, stop: List[str]) -> Any:
+            return SimpleNamespace(bound_stop=stop, pipeline=self.pipeline)
+
+    monkeypatch.setitem(
+        sys.modules,
+        "transformers",
+        SimpleNamespace(
+            AutoModelForSeq2SeqLM=AutoModel,
+            AutoTokenizer=DummyTokenizer,
+            pipeline=fake_pipeline,
+        ),
+    )
+    monkeypatch.setitem(sys.modules, "langchain_huggingface", SimpleNamespace(HuggingFacePipeline=DummyHFPipeline))
+
+    llm = cli._pick_llm(cfg)
+    llm_obj = cast(Any, llm)
+    assert llm_obj.bound_stop == ["\nQuestion:", "###END"]
+    # Even without a generation_config attribute we should still build the pipeline.
+    assert isinstance(llm_obj.pipeline, DummyPipeline)
 
 
 def test_pick_llm_uses_provider_adapter(monkeypatch: pytest.MonkeyPatch) -> None:

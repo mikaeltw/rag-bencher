@@ -26,6 +26,7 @@ def test_render_extras_renders_all_sections() -> None:
     assert "<h3>Usage</h3>" in html
 
 
+@pytest.mark.offline
 def test_render_extras_without_retrieved() -> None:
     html = report._render_extras({"pipeline": "naive"})
     assert "Retrieved snippets" not in html

@@ -1,5 +1,9 @@
+import pytest
+
 from rag_bench.eval.dataset_loader import load_texts_as_documents
 from rag_bench.pipelines import multi_query
+
+pytestmark = [pytest.mark.unit, pytest.mark.offline]
 
 
 def test_multi_query_builds_and_runs_offline() -> None:

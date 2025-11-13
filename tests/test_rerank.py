@@ -1,5 +1,9 @@
+import pytest
+
 from rag_bench.eval.dataset_loader import load_texts_as_documents
 from rag_bench.pipelines.rerank import build_chain
+
+pytestmark = [pytest.mark.unit, pytest.mark.offline]
 
 
 def test_rerank_cosine_fallback_runs() -> None:

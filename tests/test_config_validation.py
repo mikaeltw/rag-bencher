@@ -6,6 +6,8 @@ import pytest
 
 from rag_bench.config import load_config
 
+pytestmark = [pytest.mark.unit, pytest.mark.offline]
+
 
 def write_tmp(text: str) -> str:
     fd = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml", mode="w", encoding="utf-8")
