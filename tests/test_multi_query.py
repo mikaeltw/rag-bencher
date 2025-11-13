@@ -23,3 +23,15 @@ def test_fallback_queries_truncates() -> None:
     queries = multi_query._fallback_queries("question", 3)
     assert len(queries) == 3
     assert queries[0] == "question"
+
+
+def test_dedupe_queries_respects_minimum_limit() -> None:
+    result = multi_query._dedupe_queries("prompt", ["extra1", "extra2"], 0)
+    # Limit zero still returns at least one query (the base prompt)
+    assert result == ["prompt"]
+
+
+def test_dedupe_queries_preserves_order() -> None:
+    generated = ["gamma", "alpha", "gamma", "beta"]
+    result = multi_query._dedupe_queries("alpha", generated, 4)
+    assert result == ["alpha", "gamma", "beta"]
