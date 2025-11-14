@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from inspect import Parameter, Signature
 from types import SimpleNamespace
 from typing import Any, Dict
 
@@ -79,6 +80,14 @@ def test_bedrock_chat_adapter_builds_boto_client_when_region_param_missing(monke
         def __init__(self, *, temperature: float, model_id: str, client: Any) -> None:
             self.kwargs = {"temperature": temperature, "model_id": model_id, "client": client}
 
+    signature_with_client = Signature(
+        parameters=(
+            Parameter("temperature", Parameter.KEYWORD_ONLY),
+            Parameter("model_id", Parameter.KEYWORD_ONLY),
+            Parameter("client", Parameter.KEYWORD_ONLY),
+        )
+    )
+    DummyChat.__signature__ = signature_with_client  # type: ignore[attr-defined]
     monkeypatch.setitem(sys.modules, "langchain_aws", SimpleNamespace(ChatBedrock=DummyChat))
 
     def fake_client(service: str, region_name: str) -> str:
@@ -212,6 +221,18 @@ def test_azure_embeddings_adapter_uses_defaults(monkeypatch: pytest.MonkeyPatch)
         "azure_endpoint": "https://default",
         "api_version": "2024-06-01",
     }
+
+
+def test_azure_embeddings_adapter_requires_endpoint(monkeypatch: pytest.MonkeyPatch) -> None:
+    class DummyAzureEmbeddings:
+        pass
+
+    monkeypatch.setitem(sys.modules, "langchain_openai", SimpleNamespace(AzureOpenAIEmbeddings=DummyAzureEmbeddings))
+    _install_stub(monkeypatch, "rag_bench.providers.azure.embeddings.is_installed")
+
+    adapter = AzureOpenAIEmbeddingsAdapter({})
+    with pytest.raises(ValueError, match="requires endpoint"):
+        adapter.to_langchain()
 
 
 def test_azure_chat_adapter_requires_install(monkeypatch: pytest.MonkeyPatch) -> None:
