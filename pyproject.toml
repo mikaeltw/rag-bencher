@@ -91,8 +91,13 @@ addopts = [
   "--cov-report=",
   "--cov-config=pyproject.toml",
   "-ra",
-  "-Wall",
-  "-Werror",
+]
+
+filterwarnings = [
+  "default",
+  "error::Warning:rag_bench(\\.|$)",
+  # Third party errors, which we ignore
+  "ignore:.*iscoroutinefunction.*:DeprecationWarning",
 ]
 
 [tool.coverage.run]
@@ -125,7 +130,7 @@ fallback_version = "0.0.0"
 
 [tool.tox]
 requires = ["tox>=4.15", "tox-uv>=1.10"]  # uv-backed env creation & installs
-env_list = ["py312", "py313", "py314", "lint", "typecheck"]
+env_list = ["py312", "py313", "py314", "lint", "typecheck", "gpupy312", "gpupy313", "gpupy314"]
 
 [tool.tox.env_run_base]
 commands_pre = [["python", "-V"]]
@@ -134,24 +139,25 @@ commands_pre = [["python", "-V"]]
 [tool.tox.env.py312]
 package = "editable"
 deps = [".[dev]"]
-set_env = { RAG_BENCH_DEVICE = "cpu", CUDA_VISIBLE_DEVICES = "", COVERAGE_RCFILE = "pyproject.toml", COV_CORE_DATAFILE = ".coverage.{env_name}", COVERAGE_FILE = ".coverage.{env_name}", PYTHONWARNINGS = "ignore::UserWarning:argparse,ignore::UserWarning:argparse,ignore:Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.:UserWarning" }
+set_env = { RAG_BENCH_DEVICE = "cpu", CUDA_VISIBLE_DEVICES = "", COVERAGE_RCFILE = "pyproject.toml", COV_CORE_DATAFILE = ".coverage.{env_name}", COVERAGE_FILE = ".coverage.{env_name}" }
 commands = [["pytest", "-m", "unit or offline"]]
 
 [tool.tox.env.py313]
 package = "editable"
 deps = [".[dev]"]
-set_env = { RAG_BENCH_DEVICE = "cpu", CUDA_VISIBLE_DEVICES = "", COVERAGE_RCFILE = "pyproject.toml", COV_CORE_DATAFILE = ".coverage.{env_name}", COVERAGE_FILE = ".coverage.{env_name}", PYTHONWARNINGS = "ignore::UserWarning:argparse,ignore::UserWarning:argparse,ignore:Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.:UserWarning" }
+set_env = { RAG_BENCH_DEVICE = "cpu", CUDA_VISIBLE_DEVICES = "", COVERAGE_RCFILE = "pyproject.toml", COV_CORE_DATAFILE = ".coverage.{env_name}", COVERAGE_FILE = ".coverage.{env_name}" }
 commands = [["pytest", "-m", "unit or offline"]]
 
 [tool.tox.env.py314]
 package = "editable"
 deps = [".[dev]"]
-set_env = { RAG_BENCH_DEVICE = "cpu", CUDA_VISIBLE_DEVICES = "", COVERAGE_RCFILE = "pyproject.toml", COV_CORE_DATAFILE = ".coverage.{env_name}", COVERAGE_FILE = ".coverage.{env_name}", PYTHONWARNINGS = "ignore::UserWarning:argparse,ignore::UserWarning:argparse,ignore:Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.:UserWarning" }
+set_env = { RAG_BENCH_DEVICE = "cpu", CUDA_VISIBLE_DEVICES = "", COVERAGE_RCFILE = "pyproject.toml", COV_CORE_DATAFILE = ".coverage.{env_name}", COVERAGE_FILE = ".coverage.{env_name}", PYTHONWARNINGS = "ignore:Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.:UserWarning" }
 commands = [["pytest", "-m", "unit or offline"]]
 
 # --- Lint env ---
 [tool.tox.env.lint]
 package = "skip"
+base_python = ["python3.12"]
 deps = [".[dev]"]
 commands = [
   ["flake8"],
@@ -162,12 +168,30 @@ commands = [
 # --- Type check env ---
 [tool.tox.env.typecheck]
 package = "skip"
+base_python = ["python3.12"]
 deps = [".[dev]"]
 commands = [["mypy", "."]]
 
 # --- GPU env ---
-[tool.tox.env.gpu]
+[tool.tox.env.gpupy312]
 package = "skip"
+base_python = ["python3.12"]
 deps = [".[dev]"]
-set_env = { RAG_BENCH_DEVICE = "gpu", COVERAGE_RCFILE = "pyproject.toml", COV_CORE_DATAFILE = ".coverage.{env_name}", COVERAGE_FILE = ".coverage.{env_name}", PYTHONWARNINGS = "ignore::UserWarning:argparse,ignore:Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.:UserWarning" }
+set_env = { RAG_BENCH_DEVICE = "gpu", COVERAGE_RCFILE = "pyproject.toml", COV_CORE_DATAFILE = ".coverage.{env_name}", COVERAGE_FILE = ".coverage.{env_name}" }
+commands = [["pytest", "-m", "gpu"]]
+
+# --- GPU env ---
+[tool.tox.env.gpupy313]
+package = "skip"
+base_python = ["python3.13"]
+deps = [".[dev]"]
+set_env = { RAG_BENCH_DEVICE = "gpu", COVERAGE_RCFILE = "pyproject.toml", COV_CORE_DATAFILE = ".coverage.{env_name}", COVERAGE_FILE = ".coverage.{env_name}" }
+commands = [["pytest", "-m", "gpu"]]
+
+# --- GPU env ---
+[tool.tox.env.gpupy314]
+package = "skip"
+base_python = ["python3.14"]
+deps = [".[dev]"]
+set_env = { RAG_BENCH_DEVICE = "gpu", COVERAGE_RCFILE = "pyproject.toml", COV_CORE_DATAFILE = ".coverage.{env_name}", COVERAGE_FILE = ".coverage.{env_name}", PYTHONWARNINGS = "ignore:Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.:UserWarning" }
 commands = [["pytest", "-m", "gpu"]]

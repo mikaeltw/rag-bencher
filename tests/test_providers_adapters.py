@@ -72,6 +72,25 @@ def test_bedrock_chat_adapter_falls_back_to_model_id_and_client(monkeypatch: pyt
     assert calls["kwargs"]["client"] == "bedrock-runtime-client"
 
 
+def test_bedrock_chat_adapter_skips_region_and_client_when_params_missing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: Dict[str, Any] = {}
+
+    class DummyChat:
+        def __init__(self, *, temperature: float, model_id: str) -> None:
+            calls["kwargs"] = {"temperature": temperature, "model_id": model_id}
+
+    monkeypatch.setitem(sys.modules, "langchain_aws", SimpleNamespace(ChatBedrock=DummyChat))
+    _install_stub(monkeypatch, "rag_bench.providers.aws.chat.is_installed")
+
+    adapter = BedrockChatAdapter({"region": "us-west-2"}, {"model": "anthropic.claude"})
+    chat = adapter.to_langchain()
+
+    assert isinstance(chat, DummyChat)
+    assert calls["kwargs"] == {"temperature": 0, "model_id": "anthropic.claude"}
+
+
 def test_bedrock_chat_adapter_builds_boto_client_when_region_param_missing(monkeypatch: pytest.MonkeyPatch) -> None:
     boto: Dict[str, Any] = {}
 

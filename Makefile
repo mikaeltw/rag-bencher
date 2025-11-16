@@ -3,6 +3,7 @@ PY ?= 3.12
 UVX ?= uvx
 UV ?= $(UVX) uv
 TOX_ENVS ?= py312,py313,py314
+TOX_GPU_ENVS ?= gpupy312,gpupy313,gpupy314
 PY_COMPACT := $(subst .,,$(PY))
 TOX_PY_ENV ?= py$(PY_COMPACT)
 TOX_CMD ?= $(UVX) --with tox-uv tox
@@ -61,8 +62,8 @@ test:
 test-all:
 	$(TOX_CMD) -e $(TOX_ENVS)
 
-test-gpu:
-	$(TOX_CMD) -e gpu
+test-all-gpu:
+	$(TOX_CMD) -e $(TOX_GPU_ENVS)
 
 build:
 	$(UV) run python -m build
@@ -75,7 +76,7 @@ coverage-erase:
 coverage:
 	$(UV) run coverage erase
 	$(TOX_CMD) -e py312
-	$(TOX_CMD) -e gpu
+	$(TOX_CMD) -e gpupy312
 	$(UV) run coverage combine
 	$(UV) run coverage report
 	@echo "Use 'make coverage-xml' for XML (Coveralls)"
