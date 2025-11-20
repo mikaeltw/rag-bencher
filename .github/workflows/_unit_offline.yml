@@ -16,8 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        py: ['3.12', '3.13', '3.14']
     steps:
       - uses: actions/checkout@v4
 
@@ -27,50 +25,14 @@ jobs:
       - name: Sync rag-bench deps
         run: make sync
 
-      - name: Cache uv
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/uv
-          key: ${{ runner.os }}-uv-${{ matrix.py }}-${{ hashFiles('pyproject.toml', 'uv.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-uv-${{ matrix.py }}-
-            ${{ runner.os }}-uv-
-
-      - name: Cache model caches
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/huggingface
-            ~/.cache/torch
-          key: ${{ runner.os }}-hf-${{ matrix.py }}-${{ hashFiles('pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-hf-${{ matrix.py }}-
-            ${{ runner.os }}-hf-
-
-      - name: Cache .tox
-        uses: actions/cache@v4
-        with:
-          path: .tox
-          key: ${{ runner.os }}-tox-${{ matrix.py }}-${{ hashFiles('pyproject.toml', 'uv.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-tox-${{ matrix.py }}-
-            ${{ runner.os }}-tox-
-
       - name: Run tests via tox (uv backend)
         run: |
           make test-all
-
-      - name: Compute python version without dot
-        id: pythonversion
-        run: |
-          v='${{ matrix.py }}'
-          echo "short=${v/./}" >> "$GITHUB_OUTPUT"
 
       - name: Save coverage data
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cov-${{ inputs.coverage_suffix }}-${{ steps.pythonversion.outputs.short }}
-          path: .coverage.${{ inputs.coverage_suffix }}${{ steps.pythonversion.outputs.short }}
+          name: cov-${{ inputs.coverage_suffix }}
+          path: .coverage.${{ inputs.coverage_suffix }}*
           if-no-files-found: error

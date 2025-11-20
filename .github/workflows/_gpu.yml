@@ -10,6 +10,10 @@ on:
         description: "Suffix to distinguish coverage files"
         required: true
         type: string
+      gpu_image:
+        description: "Container image (with rag-bench) to run GPU tests"
+        required: false
+        type: string
 
 
 jobs:
@@ -17,59 +21,23 @@ jobs:
     runs-on: [self-hosted, linux, x64, gpu] via cirun
     strategy:
       fail-fast: false
-      matrix:
-        py: ['3.12']
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install uv & tox
-        run: make setup
-
-      - name: Sync rag-bench deps
-        run: make sync
-
-      - name: Cache uv
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/uv
-          key: ${{ runner.os }}-uv-${{ hashFiles('pyproject.toml', 'uv.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-uv-
-
-      - name: Cache model caches
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/huggingface
-            ~/.cache/torch
-          key: ${{ runner.os }}-hf-${{ hashFiles('pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-hf-
-
-      - name: Cache .tox
-        uses: actions/cache@v4
-        with:
-          path: .tox
-          key: ${{ runner.os }}-tox-${{ matrix.py }}-${{ hashFiles('pyproject.toml', 'uv.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-tox-${{ matrix.py }}-
-            ${{ runner.os }}-tox-
-
-      - name: Run tests via tox (uv backend)
+      - name: Run GPU tests inside container
+        env:
+          GPU_TEST_IMAGE: ${{ inputs.gpu_image }}
+          GCP_PROJECT: ${{ vars.GCP_PROJECT }}
+          GCP_ARTIFACT_REGION: ${{ vars.GCP_ARTIFACT_REGION || 'us' }}
+          DEFAULT_IMAGE: ${{ format('{0}-docker.pkg.dev/{1}/rag-bench/rag-bench-gpu-tests:latest', vars.GCP_ARTIFACT_REGION || 'us', vars.GCP_PROJECT) }}
         run: |
-          make test-all-gpu
-
-      - name: Compute python version without dot
-        id: pythonversion
-        run: |
-          v='${{ matrix.py }}'
-          echo "short=${v/./}" >> "$GITHUB_OUTPUT"
+          IMAGE_REF="${GPU_TEST_IMAGE:-$DEFAULT_IMAGE}"
+          IMAGE_REF="$IMAGE_REF" ./scripts/docker/run_gpu_tests.sh
 
       - name: Save coverage data
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cov-${{ inputs.coverage_suffix }}-${{ steps.pythonversion.outputs.short }}
-          path: .coverage.${{ inputs.coverage_suffix }}${{ steps.pythonversion.outputs.short }}
+          name: cov-${{ inputs.coverage_suffix }}
+          path: .coverage.${{ inputs.coverage_suffix }}*
           if-no-files-found: error
