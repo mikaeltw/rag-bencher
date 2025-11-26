@@ -91,9 +91,15 @@ gcloud compute scp \
   "${INSTALL_SCRIPT}" \
   "${INSTANCE_NAME}:~/install_gpu_host.sh"
 
+installer_env=()
+[[ -n "${DOCKER_USER:-}" ]] && installer_env+=("DOCKER_USER=${DOCKER_USER}")
+[[ -n "${INSTALL_NVIDIA_DRIVER:-}" ]] && installer_env+=("INSTALL_NVIDIA_DRIVER=${INSTALL_NVIDIA_DRIVER}")
+[[ -n "${INSTALL_UV:-}" ]] && installer_env+=("INSTALL_UV=${INSTALL_UV}")
+[[ -n "${LOCAL_SSD_DEVICE:-}" ]] && installer_env+=("LOCAL_SSD_DEVICE=${LOCAL_SSD_DEVICE}")
+
 gcloud compute ssh "${INSTANCE_NAME}" \
   --zone "${GCP_ZONE}" \
-  --command "chmod +x ~/install_gpu_host.sh && sudo ~/install_gpu_host.sh"
+  --command "chmod +x ~/install_gpu_host.sh && sudo ${installer_env[*]} ~/install_gpu_host.sh"
 
 gcloud compute instances stop "${INSTANCE_NAME}" --zone "${GCP_ZONE}"
 

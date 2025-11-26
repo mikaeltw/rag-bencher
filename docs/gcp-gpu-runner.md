@@ -60,8 +60,9 @@ gpu-runner:
     image:
       family: rag-bench-gpu-host
       project: gpu-test-runners
-    serviceAccount: runner-sa@gpu-test-runners.iam.gserviceaccount.com
+    serviceAccount: gpu-test-runners-sa@gpu-test-runners.iam.gserviceaccount.com
     serviceAccountScopes: [cloud-platform]
+    username: ci-gpu-runner
   setup:
     - name: Authenticate Docker to Artifact Registry and pre-pull image
       run: |
@@ -69,8 +70,9 @@ gpu-runner:
         HOST="${GCP_ARTIFACT_REGION:-us-central1}-docker.pkg.dev"
         PROJECT="${GCP_PROJECT:-gpu-test-runners}"
         IMAGE_REF="${HOST}/${PROJECT}/rag-bench/rag-bench-gpu-tests:latest"
-        TOKEN=$(curl -s -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" | awk -F'"' '/access_token/ {print $4}')
-        echo "${TOKEN}" | docker login -u oauth2accesstoken --password-stdin "https://${HOST}"
+        gcloud auth configure-docker ${HOST} --quiet
+        # TOKEN=$(curl -s -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" | awk -F'"' '/access_token/ {print $4}')
+        # echo "${TOKEN}" | docker login -u oauth2accesstoken --password-stdin "https://${HOST}"
         docker pull "${IMAGE_REF}"
 ```
 

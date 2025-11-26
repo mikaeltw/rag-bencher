@@ -43,17 +43,16 @@ ENV UV_CACHE_DIR=/opt/uv-cache \
     UV_PROJECT_ENVIRONMENT=/opt/rag-bench/.venv \
     PATH="/root/.local/bin:${PATH}"
 
-# Minimal runtime packages to run the tests/venv
+# Minimal runtime packages to run the tests/venv (single layer, aggressive cleanup)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       ca-certificates \
       curl \
+      make \
       python3 \
       python3-venv \
-      python3-distutils \
-      make \
-      jq && \
-    rm -rf /var/lib/apt/lists/*
+      python3-distutils && \
+    rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man /usr/share/info /tmp/* /var/tmp/*
 
 COPY --from=deps /root/.local /root/.local
 COPY --from=deps /opt/rag-bench/.venv /opt/rag-bench/.venv

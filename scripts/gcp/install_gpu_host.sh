@@ -11,6 +11,8 @@ export DEBIAN_FRONTEND=noninteractive
 
 INSTALL_NVIDIA_DRIVER="${INSTALL_NVIDIA_DRIVER:-1}"
 INSTALL_UV="${INSTALL_UV:-0}"
+DOCKER_USER="${DOCKER_USER:-ci-gpu-runner}"
+LOCAL_SSD_DEVICE="${LOCAL_SSD_DEVICE:-}"
 
 apt-get update
 apt-get install -y --no-install-recommends \
@@ -42,6 +44,11 @@ apt-get install -y --no-install-recommends \
   docker-buildx-plugin \
   docker-compose-plugin
 systemctl enable --now docker
+# Create/choose a non-root account to grant docker access. Allow override via DOCKER_USER.
+if [[ -n "${DOCKER_USER:-}" ]] && ! id "${DOCKER_USER}" &>/dev/null; then
+  useradd -m -s /bin/bash "${DOCKER_USER}"
+  echo "Added DOCKER_USER: ${DOCKER_USER}"
+fi
 # Pick a non-root account to grant docker access. Allow override via DOCKER_USER.
 pick_default_user() {
   # Preferred order: explicit override, sudo caller, uid 1000, first uid>=1000
