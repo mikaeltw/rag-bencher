@@ -54,7 +54,7 @@ The helper targets download dependencies; populate wheels locally if your networ
 
 ### Ask a single question
 ```bash
-python run.py --config configs/wiki.yaml --question "What is LangChain?"
+python scripts/run.py --config configs/wiki.yaml --question "What is LangChain?"
 # or, when installed as a package
 python -m rag_bench.cli --config configs/wiki.yaml --question "What is LangChain?"
 ```
