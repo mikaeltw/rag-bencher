@@ -1,24 +1,26 @@
-
 # rag-bench
 
 [![CI](https://img.shields.io/github/actions/workflow/status/mikaeltw/rag-bench/ci.yml?branch=main)](../../actions)
 [![PyPI](https://img.shields.io/pypi/v/rag-bench.svg)](https://pypi.org/project/rag-bench/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Reproducible retrieval-augmented generation (**RAG**) baselines and evaluation tools built on **LangChain**. Configure a pipeline in YAML, run a single command, and collect HTML reports that are easy to compare across experiments.
+Reproducible retrieval-augmented generation (RAG) baselines and an evaluation harness that makes it easy to compare pipelines across providers. Configure a pipeline in YAML, run one command, and collect HTML reports that stay consistent across experiments.
 
----
+## What "RAG comparison" means here
+- Each pipeline is defined by a YAML file that describes the chat model, embeddings, retriever settings, and optional provider/vector adapters.
+- The CLI runs the pipeline over a QA set and reports lexical F1, bag-of-words cosine, and context recall.
+- Multi-run mode sweeps multiple configs to show relative performance on the same dataset.
+- Everything is reproducible: configs are validated, caching is on by default, and offline CPU runs are available.
 
-## Why rag-bench?
-- Batteries-included baseline pipelines: **naive**, **multi-query**, **HyDE**, and **rerank**.
+## Features
+- Ready-to-run pipelines: naive, multi-query, HyDE, and rerank.
 - Config-first workflow with strict validation (Pydantic) and reproducible defaults.
-- First-class support for offline CPU runs, OpenAI-compatible chat models, and managed vector stores.
-- Evaluation harness that produces HTML summaries, ready for sharing.
-- CI-friendly: linting, smoke tests against cloud providers, GPU checks, and publishing workflows.
-
----
+- Optional adapters for OpenAI-compatible APIs, Azure OpenAI, AWS Bedrock, Vertex AI, Azure AI Search, OpenSearch, and Matching Engine.
+- HTML reports for single runs and multi-run comparisons.
+- Works fully offline on CPU via bundled Hugging Face models when cloud access is not available.
 
 ## Installation
+Requirements: Python 3.12–3.14.
 
 ### PyPI
 ```bash
@@ -27,12 +29,12 @@ pip install rag-bench
 uv pip install rag-bench
 ```
 
-### Provider & vector extras
+### Provider and vector extras
 ```bash
-pip install "rag-bench[gcp]"    # Google Vertex AI chat + Matching Engine
+pip install "rag-bench[gcp]"    # Vertex AI chat + Matching Engine
 pip install "rag-bench[aws]"    # Bedrock chat + OpenSearch vector
-pip install "rag-bench[azure]"  # Azure OpenAI chat + Azure AI Search vector
-pip install "rag-bench[providers]"  # install all provider extras
+pip install "rag-bench[azure]"  # Azure OpenAI chat + Azure AI Search
+pip install "rag-bench[providers]"  # installs all provider extras
 ```
 
 ### From source (development)
@@ -40,174 +42,118 @@ pip install "rag-bench[providers]"  # install all provider extras
 git clone https://github.com/mikaeltw/rag-bench.git
 cd rag-bench
 python -m venv venv && source venv/bin/activate
-make install          # installs rag-bench in editable mode with dev extras
+pip install -e .[dev]
+# or use uv + tox via Makefile helpers
+(make setup)         # Optional for installing uv
+make sync            # create/refresh uv-managed venv with dev extras
+make dev             # lint + typecheck + tests
 ```
-> The `make install` target reaches out to PyPI; if your environment blocks network access you will need to pre-populate wheels manually.
+The helper targets download dependencies; populate wheels locally if your network is restricted.
 
----
-
-## Quick Start
+## Quickstart
 
 ### Ask a single question
 ```bash
-# From a cloned repo
 python run.py --config configs/wiki.yaml --question "What is LangChain?"
-
-# When installed as a package
+# or, when installed as a package
 python -m rag_bench.cli --config configs/wiki.yaml --question "What is LangChain?"
 ```
 
-### Switch pipelines
-```bash
-python -m rag_bench.cli --config configs/multi_query.yaml --question "What is LangChain?"
-python -m rag_bench.cli --config configs/rerank.yaml --question "What is LangChain?"
-python -m rag_bench.cli --config configs/hyde.yaml --question "What is LangChain?"
-```
-
-### Run fully offline on CPU
-```bash
-RAG_BENCH_DEVICE=cpu \
-python -m rag_bench.cli --config configs/wiki_offline.yaml --question "What is LangChain?"
-```
-Offline mode uses the `google/flan-t5-small` seq2seq model via Hugging Face for deterministic answers on CPUs.
-
-### Target a managed provider
-```bash
-export AZURE_OPENAI_ENDPOINT="https://<your-resource>.openai.azure.com"
-export AZURE_OPENAI_API_KEY="..."
-python -m rag_bench.cli --config configs/providers/azure.yaml --question "What is LangChain?"
-```
-Every provider config expects credentials via environment variables; see [Configuration Reference](#configuration-reference).
-
----
-
-## Evaluation Harness
-
-### Benchmark one pipeline against a QA set
-```bash
-python -m rag_bench.bench_cli \
-  --config configs/multi_query.yaml \
-  --qa examples/qa/toy.jsonl
-```
-- Streams per-example metrics to the terminal.
-- Computes average `lexical_f1`, `bow_cosine`, and `context_recall`.
-- Emits a timestamped HTML report under `reports/`.
-
-### Compare multiple configs side-by-side
+### Compare two configs via CLI
 ```bash
 python -m rag_bench.bench_many_cli \
   --configs "configs/*.yaml" \
   --qa examples/qa/toy.jsonl
 ```
-Produces an aggregated HTML table (`reports/summary-*.html`) so you can compare pipelines across the same dataset quickly.
+Generates an HTML summary under `reports/summary-*.html` so you can scan relative scores quickly.
 
----
+### Minimal Python comparison example
+```python
+from pathlib import Path
 
-## Configuration Reference
+from rag_bench.config import load_config
+from rag_bench.eval.dataset_loader import load_texts_as_documents
+from rag_bench.eval.metrics import bow_cosine, context_recall, lexical_f1
+from rag_bench.pipelines.selector import select_pipeline
 
-All runtime behaviour is described through YAML files. The schema is enforced by `rag_bench.config.BenchConfig`:
+qa_examples = [
+    {"question": "What is LangChain?", "reference_answer": "A Python framework for building LLM apps."},
+    {"question": "What is RAG?", "reference_answer": "Retrieval-augmented generation combines search and generation."},
+]
 
-```yaml
-model:
-  name: gpt-4o-mini
-retriever:
-  k: 4
-data:
-  paths:
-    - examples/data/sample.txt
-runtime:
-  offline: false          # switch to true for CPU Hugging Face runs
-  device: auto            # auto | cpu | cuda
-provider:
-  name: azure             # optional; see provider examples below
-  chat:
-    deployment: gpt-4o-mini
-    endpoint: ${AZURE_OPENAI_ENDPOINT}
-vector:
-  name: azure_ai_search   # optional; see vector examples below
-  endpoint: https://<>.search.windows.net
+docs = load_texts_as_documents(["examples/data/sample.txt"])
+
+
+def evaluate(config_path: str) -> tuple[str, dict[str, float]]:
+    selection = select_pipeline(config_path, docs, load_config(config_path))
+    chain = selection.chain
+    debug = selection.debug
+
+    scores: list[dict[str, float]] = []
+    for qa in qa_examples:
+        answer = chain.invoke(qa["question"])
+        retrieved = ""
+        dbg = debug()
+        if dbg.get("retrieved"):
+            retrieved = "\n".join(item.get("preview", "") for item in dbg["retrieved"])
+        elif dbg.get("candidates"):
+            retrieved = "\n".join(item.get("preview", "") for item in dbg["candidates"][:5])
+        scores.append(
+            {
+                "lexical_f1": lexical_f1(answer, qa["reference_answer"]),
+                "bow_cosine": bow_cosine(answer, qa["reference_answer"]),
+                "context_recall": context_recall(qa["reference_answer"], retrieved) if retrieved else 0.0,
+            }
+        )
+
+    avg = {k: sum(s[k] for s in scores) / len(scores) for k in scores[0].keys()}
+    return selection.pipeline_id, avg
+
+
+for cfg in ("configs/wiki.yaml", "configs/rerank.yaml"):
+    pid, metrics = evaluate(cfg)
+    print(f"{Path(cfg).name} ({pid}) -> {metrics}")
 ```
 
-### Pipelines
-Each pipeline is enabled by a top-level key:
+## Examples
+- `examples/compare_two_pipelines.py`: small script to score two configs on a tiny QA set.
+- `examples/quickstart.ipynb`: walkthrough notebook.
+- Sample corpus lives in `examples/data/` and QA fixtures in `examples/qa/`.
 
-| Pipeline | Config file | Additional key(s) |
-|----------|-------------|-------------------|
-| Naive retrieval (default) | `configs/wiki.yaml` | none |
-| Multi-query | `configs/multi_query.yaml` | `multi_query.n_queries` |
-| HyDE | `configs/hyde.yaml` | `hyde` block (empty is fine) |
-| Rerank | `configs/rerank.yaml` | `rerank.method`, `rerank.top_k`, optional `cross_encoder_model` |
+## Running tests
+- `make test` runs offline/unit tests via tox for the configured Python version.
+- `make test-all` runs the full matrix (py312/py313/py314).
+- `make test-all-gpu` covers GPU-marked tests on a GPU host.
+- `make dev` runs lint, typecheck, and tests together.
 
-### Provider adapters
-| Provider | Config | Required environment variables |
-|----------|--------|--------------------------------|
-| AWS Bedrock | `configs/providers/aws.yaml` | `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, optional `BEDROCK_MODEL` |
-| Azure OpenAI | `configs/providers/azure.yaml` | `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, optional `AZURE_OPENAI_DEPLOYMENT`, `AZURE_OPENAI_API_VERSION` |
-| Google Vertex | `configs/providers/gcp.yaml` | `GCP_PROJECT`, `VERTEX_LOCATION`, optional `VERTEX_CHAT_MODEL`, `GOOGLE_APPLICATION_CREDENTIALS` |
+## Requirements and dependencies
+- Core dependencies: LangChain, LangChain Community/OpenAI/Hugging Face adapters, sentence-transformers.
+- Extras pull in provider-specific SDKs (Azure, AWS, GCP) and vector backends.
+- Optional: `uv` for reproducible installs, `make` targets for day-to-day tasks.
 
-If `provider` is omitted the CLI defaults to `langchain_openai.ChatOpenAI` and uses the API key in your environment.
+## Configuration basics
+- All runtime behavior is defined in YAML (see `configs/`).
+- Common keys: `model`, `retriever`, `data.paths`, `runtime.offline`, `provider` (chat/embedding adapters), and `vector` (alternate retriever stores).
+- Pipelines are toggled by presence of `multi_query`, `hyde`, or `rerank`; absence defaults to the naive RAG pipeline.
+- Provider configs pull credentials from environment variables; see `configs/providers/` for examples.
 
-### Vector backends
-Supply a `vector` block to replace the default FAISS retriever:
+## Architecture overview
+- **CLI entrypoints:** `rag_bench.cli` (single question), `rag_bench.bench_cli` (single-config benchmarking), `rag_bench.bench_many_cli` (multi-config comparisons).
+- **Config layer:** `rag_bench.config.BenchConfig` validates YAML and wires provider/vector extras.
+- **Pipeline builders:** `rag_bench.pipelines.*` assemble LangChain runnables for naive, multi-query, HyDE, and rerank flows.
+- **Evaluation:** `rag_bench.eval.*` loads datasets, computes metrics, and writes HTML reports.
+- **Providers/vectors:** adapters under `rag_bench.providers` and `rag_bench.vector` wrap cloud services while preserving the same interface.
+- **Reproducibility:** caches answers in `.ragbench_cache/`, sets seeds, and keeps reports in `reports/`.
 
-```yaml
-vector:
-  name: azure_ai_search
-  endpoint: https://<your>.search.windows.net
-  index: rag-bench
-  api_key: ${AZURE_SEARCH_API_KEY}
-```
+## Roadmap / future work
+- Add more provider smoke tests and CI examples.
+- Ship richer metrics (cost, latency) alongside the existing text similarity scores.
+- Expand notebooks and end-to-end examples for custom corpora.
 
-Available adapters:
-- `azure_ai_search`: requires `azure-search-documents` (install `rag-bench[azure]`).
-- `opensearch`: configure `hosts`, `index`, and either HTTP basic auth or IAM.
-- `matching_engine`: requires `project_id`, `location`, `index_id`, `endpoint_id` (install `rag-bench[gcp]`).
+## License
+MIT License; see `LICENSE`.
 
-### Datasets
-- `data.paths` accepts one or more plain-text files. Use `examples/data/sample.txt` as a template.
-- For question/answer benchmarking, use JSONL (`{"question": "...", "reference_answer": "..."}`) files such as `examples/qa/toy.jsonl`.
-
-### Runtime options
-- `runtime.offline: true` switches to the bundled Hugging Face pipeline.
-- `runtime.device`: `"auto"` (GPU if available), `"cpu"`, or `"cuda"`.
-- `RAG_BENCH_DEVICE` environment variable overrides the device across modules.
-
----
-
-## Reports, Caching, and Reproducibility
-- Reports are saved under `reports/` with timestamps (see `rag_bench.eval.report`).
-- Answers are cached per model/question under `.ragbench_cache/` to avoid re-billing cloud LLMs.
-- `rag_bench.utils.repro.set_seeds(42)` is invoked by the CLI to keep vector splits deterministic.
-
----
-
-## Development & Contribution
-- Follow the guidance in [CONTRIBUTING.md](CONTRIBUTING.md) for environment setup, formatting, linting, and tests.
-- Run `make fmt && make lint && make test` before pushing.
-- Update [CHANGELOG.md](CHANGELOG.md) for user-facing changes and [RELEASE.md](RELEASE.md) ahead of publishing.
-- Branch protection recommendations live in `docs/branch_protection.md`.
-
----
-
-## Continuous Integration
-
-![CI](https://github.com/mikaeltw/rag-bench/actions/workflows/ci.yml/badge.svg)
-![Nightly Cloud](https://github.com/mikaeltw/rag-bench/actions/workflows/live-cloud.yml/badge.svg)
-![GPU Tests](https://github.com/mikaeltw/rag-bench/actions/workflows/gpu.yml/badge.svg)
-
-| Workflow | Trigger | Highlights |
-|----------|---------|------------|
-| `ci.yml` | push / PR | Linting, formatting checks, unit & offline tests |
-| `live-cloud.yml` | nightly + manual | Vertex AI smoke tests |
-| `gpu.yml` | manual | GPU-tagged tests on self-hosted runners |
-| `publish-testpypi.yml` / `publish-pypi.yml` | GitHub releases | Build + publish wheels |
-
-Secrets required by each job are summarised in the workflow files; mirror them in your repository settings.
-
----
-
-## Support & Security
-- Vulnerabilities: follow the process in [SECURITY.md](SECURITY.md) (private advisory, response within 7 days).
-- Code of conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
-
-Have questions or ideas? Open an issue or discussion on GitHub. Happy benchmarking!
+## Security and support
+- Vulnerability handling is described in `SECURITY.md`.
+- Code of conduct: `CODE_OF_CONDUCT.md`.
+- Open an issue or discussion on GitHub for questions and feature requests.

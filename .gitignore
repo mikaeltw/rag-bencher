@@ -13,3 +13,11 @@ dist
 .uv-tools
 .uv-cache
 .pytest_cache
+htmlcov/
+.cache/
+.DS_Store
+.idea/
+.env
+.python-version
+reports/
+!reports/.gitkeep
