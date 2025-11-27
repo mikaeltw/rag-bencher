@@ -36,6 +36,11 @@ dependencies = [
   "numpy>=1.26.0"
 ]
 
+[project.scripts]
+rag-bench-cli = "rag_bench.cli:main"
+rag-bench-cli-bench = "rag_bench.bench_cli:main"
+rag-bench-cli-bench-many = "rag_bench.bench_many_cli:main"
+
 [project.optional-dependencies]
 dev = ["tox>=4.32.0", "pytest>=7.4.0", "pytest-cov>=4.1.0", "black>=24.4.0", "isort>=5.13.0", "flake8>=7.3.0", "flake8-pyproject>=1.2.3", "mypy>=1.18.2", "types-PyYAML>=6.0.12.20250915", "types-requests>=2.32.4.20250913", "types-setuptools>=80.9.0.20250822", "flake8-bugbear>=25.10.21", "flake8-comprehensions>=3.17.0", "flake8-annotations>=3.2.0", "flake8-docstrings>=1.7.0", "build", "twine"]
 gcp = ["langchain-google-vertexai>=0.1.0", "google-auth>=2.30.0"]
@@ -63,6 +68,7 @@ docstring-convention = "google"
 [tool.mypy]
 python_version = "3.12"
 packages = ["rag_bench"]
+files = ["src", "examples"]
 exclude_gitignore = true
 ignore_missing_imports = true
 strict = true
@@ -86,6 +92,7 @@ markers = [
 ]
 addopts = [
   "--cov=rag_bench",
+  "--cov=examples",
   "--cov-branch",
   "--no-cov-on-fail",
   "--cov-report=",
@@ -101,7 +108,7 @@ filterwarnings = [
 ]
 
 [tool.coverage.run]
-source = ["src/rag_bench"]
+source = ["src/rag_bench", "examples"]
 branch = true
 parallel = true
 omit = []
@@ -115,6 +122,7 @@ skip_covered = true
 [tool.coverage.paths]
 source = [
   "src/rag_bench",
+  "examples",
   ".tox/*/site-packages/rag_bench",
   "**/site-packages/rag_bench"
 ]
