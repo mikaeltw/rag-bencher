@@ -144,6 +144,25 @@ def test_evaluate_handles_candidate_debug(monkeypatch: pytest.MonkeyPatch) -> No
 
 
 @pytest.mark.examples
+@pytest.mark.offline
+def test_evaluate_handles_missing_debug(monkeypatch: pytest.MonkeyPatch) -> None:
+    ex, _selection = _setup_example(monkeypatch)
+    cfg = BenchConfig(model=ModelCfg(name="stub"), retriever=RetrieverCfg(k=1), data=DataCfg(paths=[]))
+    missing_debug_selection = PipelineSelection(
+        pipeline_id="stub-pipeline",
+        config=cfg,
+        chain=cast(RunnableSerializable[str, str], _DummyChain("reference")),
+        debug=lambda: {},
+    )
+    monkeypatch.setattr(ex, "select_pipeline", lambda *_args, **_kwargs: missing_debug_selection)
+
+    _, metrics = ex.evaluate("cfg-missing-debug.yaml")
+
+    assert metrics["context_recall"] == 0.0
+    assert all(v >= 0.0 for v in metrics.values())
+
+
+@pytest.mark.examples
 @pytest.mark.gpu
 def test_script_runs_under_main_guard(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
     out = _run_main_with_stubbed_modules(
