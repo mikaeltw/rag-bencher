@@ -88,7 +88,9 @@ markers = [
   "offline: no network",
   "cloud: live cloud smoke tests",
   "gpu: requires CUDA",
-  "vector: live cloud vector smoke tests"
+  "examples: runs example scripts",
+  "vector: live cloud vector smoke tests",
+  "integration: Integration tests for the CLIs"
 ]
 addopts = [
   "--cov=rag_bench",
@@ -186,7 +188,7 @@ package = "skip"
 base_python = ["python3.12"]
 deps = [".[dev]"]
 set_env = { RAG_BENCH_DEVICE = "gpu", COVERAGE_RCFILE = "pyproject.toml", COV_CORE_DATAFILE = ".coverage.{env_name}", COVERAGE_FILE = ".coverage.{env_name}" }
-commands = [["pytest", "-m", "gpu"]]
+commands = [["pytest", "-m", "gpu or integration"]]
 
 # --- GPU env ---
 [tool.tox.env.gpupy313]
@@ -194,7 +196,7 @@ package = "skip"
 base_python = ["python3.13"]
 deps = [".[dev]"]
 set_env = { RAG_BENCH_DEVICE = "gpu", COVERAGE_RCFILE = "pyproject.toml", COV_CORE_DATAFILE = ".coverage.{env_name}", COVERAGE_FILE = ".coverage.{env_name}" }
-commands = [["pytest", "-m", "gpu"]]
+commands = [["pytest", "-m", "gpu or integration"]]
 
 # --- GPU env ---
 [tool.tox.env.gpupy314]
@@ -202,4 +204,4 @@ package = "skip"
 base_python = ["python3.14"]
 deps = [".[dev]"]
 set_env = { RAG_BENCH_DEVICE = "gpu", COVERAGE_RCFILE = "pyproject.toml", COV_CORE_DATAFILE = ".coverage.{env_name}", COVERAGE_FILE = ".coverage.{env_name}", PYTHONWARNINGS = "ignore:Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.:UserWarning" }
-commands = [["pytest", "-m", "gpu"]]
+commands = [["pytest", "-m", "gpu or integration"]]
