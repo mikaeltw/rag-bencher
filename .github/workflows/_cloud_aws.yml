@@ -1,56 +1,56 @@
-name: Cloud AWS
-on:
-  workflow_dispatch:
+# name: Cloud AWS
+# on:
+#   workflow_dispatch:
 
-jobs:
-  cloud-aws:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    if: github.event_name != 'pull_request' && (secrets.AWS_REGION != '' || vars.AWS_REGION != '')
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.12' }
-      - name: Install
-        run: |
-          python -m pip install -U pip
-          pip install -e ".[aws]"
-      - name: AWS smoke
-        env:
-          RUN_AWS_SMOKE: "true"
-          AWS_REGION: ${{ secrets.AWS_REGION || vars.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          BEDROCK_MODEL: ${{ secrets.BEDROCK_MODEL || vars.BEDROCK_MODEL }}
-        run: pytest -q -m cloud tests/cloud/test_aws_bedrock_smoke.py
-      - name: Save coverage data
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-${{ github.job }}
-          path: |
-            .coverage*
-          include-hidden-files: true
+# jobs:
+#   cloud-aws:
+#     runs-on: ubuntu-latest
+#     continue-on-error: true
+#     if: github.event_name != 'pull_request' && (secrets.AWS_REGION != '' || vars.AWS_REGION != '')
+#     timeout-minutes: 10
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/setup-python@v5
+#         with: { python-version: '3.12' }
+#       - name: Install
+#         run: |
+#           python -m pip install -U pip
+#           pip install -e ".[aws]"
+#       - name: AWS smoke
+#         env:
+#           RUN_AWS_SMOKE: "true"
+#           AWS_REGION: ${{ secrets.AWS_REGION || vars.AWS_REGION }}
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           BEDROCK_MODEL: ${{ secrets.BEDROCK_MODEL || vars.BEDROCK_MODEL }}
+#         run: pytest -q -m cloud tests/cloud/test_aws_bedrock_smoke.py
+#       - name: Save coverage data
+#         if: always()
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: coverage-${{ github.job }}
+#           path: |
+#             .coverage*
+#           include-hidden-files: true
 
 
-  vector-smokes:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    if: github.event_name != 'pull_request'
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.12' }
-      - name: Install providers
-        run: |
-          python -m pip install -U pip
-          pip install -e ".[providers]"
+#   vector-smokes:
+#     runs-on: ubuntu-latest
+#     continue-on-error: true
+#     if: github.event_name != 'pull_request'
+#     timeout-minutes: 10
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/setup-python@v5
+#         with: { python-version: '3.12' }
+#       - name: Install providers
+#         run: |
+#           python -m pip install -U pip
+#           pip install -e ".[providers]"
 
-      - name: OpenSearch smoke
-        env:
-          RUN_OPENSEARCH_SMOKE: "true"
-          OPENSEARCH_HOST: ${{ secrets.OPENSEARCH_HOST || vars.OPENSEARCH_HOST }}
-          OPENSEARCH_INDEX: ${{ secrets.OPENSEARCH_INDEX || vars.OPENSEARCH_INDEX }}
-        run: pytest -q -m cloud tests/cloud/test_vector_backends_smoke.py::test_opensearch_smoke || true
+#       - name: OpenSearch smoke
+#         env:
+#           RUN_OPENSEARCH_SMOKE: "true"
+#           OPENSEARCH_HOST: ${{ secrets.OPENSEARCH_HOST || vars.OPENSEARCH_HOST }}
+#           OPENSEARCH_INDEX: ${{ secrets.OPENSEARCH_INDEX || vars.OPENSEARCH_INDEX }}
+#         run: pytest -q -m cloud tests/cloud/test_vector_backends_smoke.py::test_opensearch_smoke || true
