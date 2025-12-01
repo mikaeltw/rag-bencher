@@ -6,25 +6,22 @@ on:
 
 jobs:
   LintTypecheck:
-    uses: .github/workflows/_lint-typecheck-check.yml
-    with:
-      marker: "lint-typecheck"
-      suffix: "lint-typecheck"
+    uses: ./.github/workflows/_lint-type-check.yml
 
   UnitOffline:
-    uses: .github/workflows/_unit_offline.yml
+    uses: ./.github/workflows/_unit_offline.yml
     with:
       marker: "unit-offline"
-      suffix: "py"
+      coverage_suffix: "py"
 
   GPU:
-    uses: .github/workflows/_gpu.yml
+    uses: ./.github/workflows/_gpu.yml
     with:
       marker: "gpu"
-      suffix: "gpupy"
+      coverage_suffix: "gpupy"
 
   Coverage:
     needs: [UnitOffline, GPU]
-    uses: .github/workflows/_coveralls.yml
+    uses: ./.github/workflows/_coveralls.yml
     with:
       expect: "unit-offline,gpu"
