@@ -14,25 +14,6 @@ jobs:
       - name: Sync rag-bench deps
         run: make sync
 
-      - name: Cache uv
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/uv
-          key: ${{ runner.os }}-uv-${{ hashFiles('pyproject.toml', 'uv.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-uv-
-
-      - name: Cache model caches
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/huggingface
-            ~/.cache/torch
-          key: ${{ runner.os }}-hf-${{ hashFiles('pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-hf-
-
       - name: Lint
         run: |
           make lint
