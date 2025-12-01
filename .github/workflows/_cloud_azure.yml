@@ -2,6 +2,11 @@
 
 
 
+name: Cloud Azure
+on:
+  workflow_dispatch:
+
+jobs:
   cloud-azure:
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -31,6 +36,7 @@
           name: coverage-${{ github.job }}
           path: |
             .coverage*
+          include-hidden-files: true
 
   vector-smokes:
     runs-on: ubuntu-latest

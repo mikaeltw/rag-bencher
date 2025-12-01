@@ -1,5 +1,10 @@
 
 
+name: Cloud GCP
+on:
+  workflow_dispatch:
+
+jobs:
   cloud-gcp:
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -34,6 +39,7 @@
           name: coverage-${{ github.job }}
           path: |
             .coverage*
+          include-hidden-files: true
 
 
   vector-smokes:

@@ -1,5 +1,8 @@
+name: Cloud AWS
+on:
+  workflow_dispatch:
 
-
+jobs:
   cloud-aws:
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -28,6 +31,7 @@
           name: coverage-${{ github.job }}
           path: |
             .coverage*
+          include-hidden-files: true
 
 
   vector-smokes:
@@ -44,7 +48,7 @@
           python -m pip install -U pip
           pip install -e ".[providers]"
 
-                  - name: OpenSearch smoke
+      - name: OpenSearch smoke
         env:
           RUN_OPENSEARCH_SMOKE: "true"
           OPENSEARCH_HOST: ${{ secrets.OPENSEARCH_HOST || vars.OPENSEARCH_HOST }}
