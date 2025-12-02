@@ -36,7 +36,7 @@ jobs:
           ls -la covparts
           uvx uv run coverage combine covparts
           uvx uv run coverage xml
-          uvx uv run overage report --fail-under=100
+          uvx uv run coverage report --fail-under=100
 
       - name: Coveralls finish
         uses: coverallsapp/github-action@v2
