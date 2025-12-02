@@ -125,6 +125,8 @@ skip_covered = true
 source = [
   "src/rag_bench",
   "examples",
+  "*/src/rag_bench",
+  "*/examples",
   ".tox/*/site-packages/rag_bench",
   "**/site-packages/rag_bench"
 ]
