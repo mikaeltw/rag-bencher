@@ -21,6 +21,9 @@ jobs:
       - name: Sync rag-bench deps
         run: make sync
 
+      - name: Erase possible coverage leftovers
+        run: uvx uv run coverage erase
+
       - name: Download coverage artifacts
         uses: actions/download-artifact@v4
         with:
@@ -31,9 +34,9 @@ jobs:
       - name: Combine coverage
         run: |
           ls -la covparts
-          python -m coverage combine covparts
-          python -m coverage xml
-          python -m coverage report --fail-under=100
+          uvx uv run coverage combine covparts
+          uvx uv run coverage xml
+          uvx uv run overage report --fail-under=100
 
       - name: Coveralls finish
         uses: coverallsapp/github-action@v2

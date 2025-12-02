@@ -11,6 +11,11 @@ runners:
 
     extra_config:
       project_id: gpu-test-runners
+
+      baseDisk:
+        diskType: "pd-ssd"
+        diskSizeGb: 100
+
       serviceAccounts:
         - email: gpu-test-runners-sa@gpu-test-runners.iam.gserviceaccount.com
           scopes:

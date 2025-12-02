@@ -23,12 +23,6 @@ if ! command -v docker >/dev/null 2>&1; then
   exit 1
 fi
 
-HUGGINGFACE_CACHE="${HUGGINGFACE_CACHE:-$HOME/.cache/huggingface}"
-TORCH_CACHE="${TORCH_CACHE:-$HOME/.cache/torch}"
-UV_CACHE="${UV_CACHE:-$HOME/.cache/uv}"
-
-mkdir -p "${HUGGINGFACE_CACHE}" "${TORCH_CACHE}" "${UV_CACHE}"
-
 gcloud auth configure-docker ${GCP_ARTIFACT_REGION}-docker.pkg.dev --quiet
 
 docker pull "${IMAGE_REF}" || echo "Pull failed (probably have not pushed yet). Using local image."
@@ -36,9 +30,6 @@ docker pull "${IMAGE_REF}" || echo "Pull failed (probably have not pushed yet). 
 docker run --rm --gpus all \
   -v "$PWD":/workspace \
   -w /workspace \
-  -v "${HUGGINGFACE_CACHE}":/root/.cache/huggingface \
-  -v "${TORCH_CACHE}":/root/.cache/torch \
-  -v "${UV_CACHE}":/root/.cache/uv \
   -e RAG_BENCH_DEVICE=gpu \
   "${DOCKER_ENTRYPOINT[@]}" \
   "${IMAGE_REF}" \
