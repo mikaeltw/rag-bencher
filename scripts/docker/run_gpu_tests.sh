@@ -2,14 +2,13 @@
 
 set -euo pipefail
 
-if [[ -z "${IMAGE_REF:-}" ]]; then
-  if [[ -n "${GCP_PROJECT:-}" ]]; then
-    GCP_ARTIFACT_REGION="${GCP_ARTIFACT_REGION:-us}"
-    IMAGE_REF="${GCP_ARTIFACT_REGION}-docker.pkg.dev/${GCP_PROJECT}/rag-bench/rag-bench-gpu-tests:latest"
-  else
-    IMAGE_REF="rag-bench-gpu-tests:latest"
-  fi
-fi
+GCP_ARTIFACT_REGION="${GCP_ARTIFACT_REGION:-us-central1}"
+GCP_PROJECT="${GCP_PROJECT:-gpu-test-runners}"
+REPOSITORY="${REPOSITORY:-rag-bench}"
+PACKAGE="${PACKAGE:-rag-bench-gpu-tests}"
+IMAGE_VERSION="${IMAGE_VERSION:-latest}"
+
+IMAGE_REF="${GCP_ARTIFACT_REGION}-docker.pkg.dev/${GCP_PROJECT}/${REPOSITORY}/${PACKAGE}:${IMAGE_VERSION}"
 
 DOCKER_ENTRYPOINT=()
 if [[ $# -eq 0 ]]; then
@@ -29,6 +28,10 @@ TORCH_CACHE="${TORCH_CACHE:-$HOME/.cache/torch}"
 UV_CACHE="${UV_CACHE:-$HOME/.cache/uv}"
 
 mkdir -p "${HUGGINGFACE_CACHE}" "${TORCH_CACHE}" "${UV_CACHE}"
+
+gcloud auth configure-docker ${GCP_ARTIFACT_REGION}-docker.pkg.dev --quiet
+
+docker pull "${IMAGE_REF}" || echo "Pull failed (probably have not pushed yet). Using local image."
 
 docker run --rm --gpus all \
   -v "$PWD":/workspace \

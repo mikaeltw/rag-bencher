@@ -28,13 +28,16 @@ jobs:
 
       - name: Run GPU tests inside container
         env:
-          GPU_TEST_IMAGE: ${IMAGE_REF}
-          GCP_PROJECT: ${GCP_PROJECT}
-          GCP_ARTIFACT_REGION: ${GCP_ARTIFACT_REGION}
-          DEFAULT_IMAGE: ${IMAGE_REF}
+          GCP_ARTIFACT_REGION: ${{ vars.GCP_ARTIFACT_REGION }}
+          GCP_PROJECT: ${{ vars.GCP_PROJECT }}
+          REPOSITORY: ${{ vars.REPOSITORY }}
+          PACKAGE: ${{ vars.PACKAGE }}
+          IMAGE_VERSION: ${{ vars.IMAGE_VERSION }}
         run: |
-          IMAGE_REF="${GPU_TEST_IMAGE:-$DEFAULT_IMAGE}"
-          IMAGE_REF="$IMAGE_REF" ./scripts/docker/run_gpu_tests.sh
+          sudo -u ci-gpu-runner bash -lc '
+            whoami
+            ./scripts/docker/run_gpu_tests.sh
+          '
 
       - name: Save coverage data
         if: always()
