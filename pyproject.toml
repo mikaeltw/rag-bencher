@@ -110,29 +110,39 @@ filterwarnings = [
 ]
 
 [tool.coverage.run]
-source = ["src/rag_bench", "examples"]
 branch = true
 parallel = true
-omit = []
 relative_files = true
-
-[tool.coverage.report]
-show_missing = true
-skip_covered = true
-#fail_under = 100.0
+source = ["src/rag_bench", "examples",]
 
 # Normalize paths from different runners (Linux/macOS, tox, Actions)
 [tool.coverage.paths]
-source = [
+rag_bench = [
   "src/rag_bench",
-  "examples",
   "/workspace/src/rag_bench",
-  "/workspace/examples",
   "*/src/rag_bench",
+  ".tox/*/site-packages/rag_bench",
+  "**/site-packages/rag_bench"
+]
+examples = [
+  "examples",
+  "/workspace/examples",
   "*/examples",
   ".tox/*/site-packages/rag_bench",
   "**/site-packages/rag_bench"
 ]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+omit = [
+    ".venv/*",
+    ".tox/*",
+    "*/site-packages/*",
+    "tests/*",
+    "build/*",
+]
+#fail_under = 100.0
 
 [tool.setuptools.packages.find]
 where = ["src"]
