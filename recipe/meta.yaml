@@ -1,0 +1,51 @@
+{% set name = "rag-bencher" %}
+{% set version = environ.get("PKG_VERSION", "0.0.0.dev0") %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  path: ..
+
+build:
+  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv
+
+requirements:
+  host:
+    - python >=3.12,<=3.14
+    - pip
+  run:
+    - python >=3.12,<=3.14
+    - langchain >=0.2.0
+    - langchain-community >=0.2.0
+    - langchain-openai >=0.1.0
+    - langchain-huggingface >= 0.1.0
+    - sentence-transformers >=2.2.2
+    - faiss-cpu >=1.7.4
+    - pydantic >=2.7.0
+    - pyyaml >=6.0.1
+    - rich >=13.7.0
+    - numpy >=1.26.0
+
+test:
+  imports:
+    - rag_bencher
+  commands:
+    - python -m rag_bencher.cli --help
+    - python -m rag_bencher.bench_cli --help
+    - python -m rag_bencher.bench_many_cli --help
+  requires:
+    - python >=3.12,<=3.14
+
+about:
+  home: https://github.com/mikaeltw/rag-bencher
+  summary: "Benchmarking framework for RAG systems"
+  license: MIT
+  license_file: LICENSE
+  dev_url: https://github.com/mikaeltw/rag-bencher
+
+extra:
+  recipe-maintainers:
+    - mikaeltw
