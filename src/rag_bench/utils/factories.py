@@ -23,7 +23,7 @@ def make_hf_embeddings(
     """Create a HuggingFaceEmbeddings with device already set from global policy.
 
     Usage everywhere:
-        from rag_bench.utils.factories import make_hf_embeddings
+        from rag_bencher.utils.factories import make_hf_embeddings
         embed = make_hf_embeddings()
     """
     from langchain_huggingface import HuggingFaceEmbeddings  # local import

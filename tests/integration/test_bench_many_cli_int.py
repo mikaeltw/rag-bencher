@@ -5,9 +5,9 @@ from typing import Any, cast
 import pytest
 from langchain_core.runnables import RunnableSerializable
 
-from rag_bench import bench_many_cli
-from rag_bench.config import BenchConfig, DataCfg, ModelCfg, RetrieverCfg
-from rag_bench.pipelines.selector import PipelineSelection
+from rag_bencher import bench_many_cli
+from rag_bencher.config import BenchConfig, DataCfg, ModelCfg, RetrieverCfg
+from rag_bencher.pipelines.selector import PipelineSelection
 
 
 class _DummyChain:
@@ -58,7 +58,7 @@ def test_bench_many_cli_writes_summary(
         sys,
         "argv",
         [
-            "rag-bench-cli-bench-many",
+            "rag-bencher-cli-bench-many",
             "--configs",
             str(tmp_path / "cfg*.yaml"),
             "--qa",

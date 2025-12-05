@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from rag_bench.utils import hardware
+from rag_bencher.utils import hardware
 
 
 @pytest.mark.unit

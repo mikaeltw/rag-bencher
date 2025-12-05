@@ -15,7 +15,7 @@ class VertexEmbeddingsAdapter:
 
     def to_langchain(self) -> "VertexAIEmbeddings":
         if not is_installed():
-            raise RuntimeError("Install: rag-bench[gcp]")
+            raise RuntimeError("Install: rag-bencher[gcp]")
         from langchain_google_vertexai import VertexAIEmbeddings
 
         params = signature(VertexAIEmbeddings).parameters

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from rag_bench.eval import report
+from rag_bencher.eval import report
 
 
 @pytest.mark.offline
@@ -45,7 +45,7 @@ def test_write_simple_report_creates_file(monkeypatch: pytest.MonkeyPatch, tmp_p
     output = Path(path)
     assert output.exists()
     html = output.read_text(encoding="utf-8")
-    assert "rag-bench report" in html
+    assert "rag-bencher report" in html
     assert "Who?" in html
     assert "Answer" in html
     assert "retrieved" in html.lower()

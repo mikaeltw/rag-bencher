@@ -1,6 +1,6 @@
 import pytest
 
-from rag_bench.utils.torch_utils import cuda_available
+from rag_bencher.utils.torch_utils import cuda_available
 
 pytestmark = pytest.mark.gpu
 

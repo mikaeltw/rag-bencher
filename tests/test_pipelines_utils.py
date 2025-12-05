@@ -5,7 +5,7 @@ from typing import Any, cast
 import pytest
 from langchain_core.runnables import RunnableLambda, RunnableSerializable
 
-from rag_bench.pipelines import utils
+from rag_bencher.pipelines import utils
 
 pytestmark = pytest.mark.unit
 

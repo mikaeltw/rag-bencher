@@ -16,7 +16,7 @@ class BedrockChatAdapter:
 
     def to_langchain(self) -> "ChatBedrock":
         if not is_installed():
-            raise RuntimeError("Install: rag-bench[aws]")
+            raise RuntimeError("Install: rag-bencher[aws]")
         from langchain_aws import ChatBedrock
 
         kwargs: dict[str, Any] = {"temperature": self.cfg.get("temperature", 0)}

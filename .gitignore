@@ -3,7 +3,7 @@ venv
 .ipynb
 __pycache__
 *.egg-info
-.ragbench_cache
+.ragbencher_cache
 .mypy_cache
 .tox
 build/

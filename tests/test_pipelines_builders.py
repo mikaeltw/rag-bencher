@@ -8,8 +8,8 @@ from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.runnables import RunnableLambda, RunnableSerializable
 
-from rag_bench.pipelines import base as pipelines_base
-from rag_bench.pipelines import hyde, multi_query, naive_rag, rerank
+from rag_bencher.pipelines import base as pipelines_base
+from rag_bencher.pipelines import hyde, multi_query, naive_rag, rerank
 
 pytestmark = [pytest.mark.unit, pytest.mark.offline]
 

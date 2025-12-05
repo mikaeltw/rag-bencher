@@ -10,7 +10,7 @@ fi
 : "${GCP_PROJECT:?Set GCP_PROJECT to the target project id}"
 : "${GCP_ZONE:?Set GCP_ZONE to the zone to use}"
 
-IMAGE_FAMILY="${IMAGE_FAMILY:-rag-bench-gpu-host}"
+IMAGE_FAMILY="${IMAGE_FAMILY:-rag-bencher-gpu-host}"
 IMAGE_NAME="${IMAGE_NAME:-${IMAGE_FAMILY}-$(date +%Y%m%d-%H%M%S)}"
 INSTANCE_NAME="${INSTANCE_NAME:-${IMAGE_NAME}-builder}"
 MACHINE_TYPE="${MACHINE_TYPE:-n1-standard-4}"
@@ -81,7 +81,7 @@ gcloud compute instances create "${INSTANCE_NAME}" \
   --scopes cloud-platform \
   --network "${NETWORK}" \
   --subnet "${SUBNET}" \
-  --tags rag-bench-gpu-builder \
+  --tags rag-bencher-gpu-builder \
   $(if [[ "${PROVISIONING_MODEL}" == "SPOT" ]]; then echo "--instance-termination-action=DELETE"; fi)
 
 wait_for_ssh

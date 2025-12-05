@@ -1,7 +1,7 @@
 import pytest
 
-from rag_bench.eval.dataset_loader import load_texts_as_documents
-from rag_bench.pipelines.rerank import build_chain
+from rag_bencher.eval.dataset_loader import load_texts_as_documents
+from rag_bencher.pipelines.rerank import build_chain
 
 pytestmark = [pytest.mark.unit, pytest.mark.offline]
 

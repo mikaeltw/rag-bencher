@@ -14,7 +14,7 @@ class VertexChatAdapter:
 
     def to_langchain(self) -> "ChatVertexAI":
         if not is_installed():
-            raise RuntimeError("Install: rag-bench[gcp]")
+            raise RuntimeError("Install: rag-bencher[gcp]")
         from langchain_google_vertexai import ChatVertexAI
 
         return ChatVertexAI(

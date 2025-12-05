@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from rag_bench.eval import report
+from rag_bencher.eval import report
 
 pytestmark = pytest.mark.gpu
 
@@ -31,4 +31,4 @@ def test_write_simple_report_without_extras(tmp_path: Path, monkeypatch: pytest.
     saved = Path(path)
     assert saved.exists()
     content = saved.read_text(encoding="utf-8")
-    assert "rag-bench report" in content
+    assert "rag-bencher report" in content

@@ -12,7 +12,7 @@ from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStore
 
-from rag_bench.vector import local
+from rag_bencher.vector import local
 
 pytestmark = [pytest.mark.unit, pytest.mark.offline]
 

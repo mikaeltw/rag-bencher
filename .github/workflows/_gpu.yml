@@ -11,7 +11,7 @@ on:
         required: true
         type: string
       gpu_image:
-        description: "Container image (with rag-bench) to run GPU tests"
+        description: "Container image (with rag-bencher) to run GPU tests"
         required: false
         type: string
 

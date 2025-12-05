@@ -1,7 +1,7 @@
 import pytest
 
-from rag_bench.eval.dataset_loader import load_texts_as_documents
-from rag_bench.pipelines import multi_query
+from rag_bencher.eval.dataset_loader import load_texts_as_documents
+from rag_bencher.pipelines import multi_query
 
 pytestmark = [pytest.mark.unit, pytest.mark.offline]
 

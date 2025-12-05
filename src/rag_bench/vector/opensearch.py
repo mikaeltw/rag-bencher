@@ -16,7 +16,7 @@ def _require() -> Type["OpenSearchVectorSearch"]:
 
         return OpenSearchVectorSearch
     except Exception as e:
-        raise RuntimeError("OpenSearch requires opensearch-py (install rag-bench[aws])") from e
+        raise RuntimeError("OpenSearch requires opensearch-py (install rag-bencher[aws])") from e
 
 
 class OpenSearchBackend:

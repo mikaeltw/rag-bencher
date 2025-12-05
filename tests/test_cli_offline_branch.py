@@ -7,7 +7,7 @@ from typing import Any, List, cast
 
 import pytest
 
-from rag_bench import cli
+from rag_bencher import cli
 
 pytestmark = [pytest.mark.unit, pytest.mark.offline]
 

@@ -6,13 +6,13 @@ from typing import Any, Dict
 
 import pytest
 
-from rag_bench.providers import base
-from rag_bench.providers.aws.chat import BedrockChatAdapter
-from rag_bench.providers.aws.embeddings import BedrockEmbeddingsAdapter
-from rag_bench.providers.azure.chat import AzureOpenAIChatAdapter
-from rag_bench.providers.azure.embeddings import AzureOpenAIEmbeddingsAdapter
-from rag_bench.providers.gcp.chat import VertexChatAdapter
-from rag_bench.providers.gcp.embeddings import VertexEmbeddingsAdapter
+from rag_bencher.providers import base
+from rag_bencher.providers.aws.chat import BedrockChatAdapter
+from rag_bencher.providers.aws.embeddings import BedrockEmbeddingsAdapter
+from rag_bencher.providers.azure.chat import AzureOpenAIChatAdapter
+from rag_bencher.providers.azure.embeddings import AzureOpenAIEmbeddingsAdapter
+from rag_bencher.providers.gcp.chat import VertexChatAdapter
+from rag_bencher.providers.gcp.embeddings import VertexEmbeddingsAdapter
 
 pytestmark = [pytest.mark.unit, pytest.mark.offline]
 
@@ -39,7 +39,7 @@ def test_bedrock_chat_adapter_uses_model_and_region(monkeypatch: pytest.MonkeyPa
             calls["kwargs"] = {"temperature": temperature, "model": model, "region_name": region_name}
 
     monkeypatch.setitem(sys.modules, "langchain_aws", SimpleNamespace(ChatBedrock=DummyChat))
-    _install_stub(monkeypatch, "rag_bench.providers.aws.chat.is_installed")
+    _install_stub(monkeypatch, "rag_bencher.providers.aws.chat.is_installed")
 
     adapter = BedrockChatAdapter({"region": "us-west-2"}, {"model": "anthropic.claude", "temperature": 0.25})
     llm = adapter.to_langchain()
@@ -62,7 +62,7 @@ def test_bedrock_chat_adapter_falls_back_to_model_id_and_client(monkeypatch: pyt
 
     monkeypatch.setitem(sys.modules, "langchain_aws", SimpleNamespace(ChatBedrock=DummyChat))
     monkeypatch.setitem(sys.modules, "boto3", SimpleNamespace(client=fake_client))
-    _install_stub(monkeypatch, "rag_bench.providers.aws.chat.is_installed")
+    _install_stub(monkeypatch, "rag_bencher.providers.aws.chat.is_installed")
 
     adapter = BedrockChatAdapter({"region": "eu-central-1"}, {"model": "anthropic.claude"})
     adapter.to_langchain()
@@ -82,7 +82,7 @@ def test_bedrock_chat_adapter_skips_region_and_client_when_params_missing(
             calls["kwargs"] = {"temperature": temperature, "model_id": model_id}
 
     monkeypatch.setitem(sys.modules, "langchain_aws", SimpleNamespace(ChatBedrock=DummyChat))
-    _install_stub(monkeypatch, "rag_bench.providers.aws.chat.is_installed")
+    _install_stub(monkeypatch, "rag_bencher.providers.aws.chat.is_installed")
 
     adapter = BedrockChatAdapter({"region": "us-west-2"}, {"model": "anthropic.claude"})
     chat = adapter.to_langchain()
@@ -100,7 +100,7 @@ def test_bedrock_chat_adapter_builds_boto_client_when_region_param_missing(monke
 
     monkeypatch.setitem(sys.modules, "langchain_aws", SimpleNamespace(ChatBedrock=DummyChat))
     monkeypatch.setattr(
-        "rag_bench.providers.aws.chat.signature",
+        "rag_bencher.providers.aws.chat.signature",
         lambda _callable: SimpleNamespace(
             parameters={"temperature": object(), "model_id": object(), "client": object()}
         ),
@@ -111,7 +111,7 @@ def test_bedrock_chat_adapter_builds_boto_client_when_region_param_missing(monke
         return "runtime-client"
 
     monkeypatch.setitem(sys.modules, "boto3", SimpleNamespace(client=fake_client))
-    _install_stub(monkeypatch, "rag_bench.providers.aws.chat.is_installed")
+    _install_stub(monkeypatch, "rag_bencher.providers.aws.chat.is_installed")
 
     adapter = BedrockChatAdapter({"region": "sa-east-1"}, {"model": "anthropic.claude"})
     chat = adapter.to_langchain()
@@ -127,7 +127,7 @@ def test_bedrock_chat_adapter_errors_when_model_not_supported(monkeypatch: pytes
             pass
 
     monkeypatch.setitem(sys.modules, "langchain_aws", SimpleNamespace(ChatBedrock=DummyChat))
-    _install_stub(monkeypatch, "rag_bench.providers.aws.chat.is_installed")
+    _install_stub(monkeypatch, "rag_bencher.providers.aws.chat.is_installed")
 
     adapter = BedrockChatAdapter({}, {})
     with pytest.raises(RuntimeError, match="requires either 'model' or 'model_id'"):
@@ -135,9 +135,9 @@ def test_bedrock_chat_adapter_errors_when_model_not_supported(monkeypatch: pytes
 
 
 def test_bedrock_chat_adapter_requires_install(monkeypatch: pytest.MonkeyPatch) -> None:
-    _fail_install(monkeypatch, "rag_bench.providers.aws.chat.is_installed")
+    _fail_install(monkeypatch, "rag_bencher.providers.aws.chat.is_installed")
     adapter = BedrockChatAdapter({}, {})
-    with pytest.raises(RuntimeError, match="Install: rag-bench\\[aws]"):
+    with pytest.raises(RuntimeError, match="Install: rag-bencher\\[aws]"):
         adapter.to_langchain()
 
 
@@ -149,7 +149,7 @@ def test_bedrock_embeddings_adapter_builds_client(monkeypatch: pytest.MonkeyPatc
             calls["kwargs"] = {"model_id": model_id, "region_name": region_name}
 
     monkeypatch.setitem(sys.modules, "langchain_aws", SimpleNamespace(BedrockEmbeddings=DummyEmbeddings))
-    _install_stub(monkeypatch, "rag_bench.providers.aws.embeddings.is_installed")
+    _install_stub(monkeypatch, "rag_bencher.providers.aws.embeddings.is_installed")
 
     adapter = BedrockEmbeddingsAdapter({"region": "ap-south-1"}, {"model": "amazon.titan"})
     emb = adapter.to_langchain()
@@ -159,14 +159,14 @@ def test_bedrock_embeddings_adapter_builds_client(monkeypatch: pytest.MonkeyPatc
 
 
 def test_bedrock_embeddings_adapter_requires_install(monkeypatch: pytest.MonkeyPatch) -> None:
-    _fail_install(monkeypatch, "rag_bench.providers.aws.embeddings.is_installed")
+    _fail_install(monkeypatch, "rag_bencher.providers.aws.embeddings.is_installed")
     adapter = BedrockEmbeddingsAdapter({}, {})
-    with pytest.raises(RuntimeError, match="Install: rag-bench\\[aws]"):
+    with pytest.raises(RuntimeError, match="Install: rag-bencher\\[aws]"):
         adapter.to_langchain()
 
 
 def test_azure_chat_adapter_requires_endpoint(monkeypatch: pytest.MonkeyPatch) -> None:
-    _install_stub(monkeypatch, "rag_bench.providers.azure.chat.is_installed")
+    _install_stub(monkeypatch, "rag_bencher.providers.azure.chat.is_installed")
     adapter = AzureOpenAIChatAdapter({"deployment": "gpt4"})
     with pytest.raises(ValueError, match="requires endpoint"):
         adapter.to_langchain()
@@ -180,7 +180,7 @@ def test_azure_chat_adapter_builds_client(monkeypatch: pytest.MonkeyPatch) -> No
             calls["kwargs"] = kwargs
 
     monkeypatch.setitem(sys.modules, "langchain_openai", SimpleNamespace(AzureChatOpenAI=DummyAzureChat))
-    _install_stub(monkeypatch, "rag_bench.providers.azure.chat.is_installed")
+    _install_stub(monkeypatch, "rag_bencher.providers.azure.chat.is_installed")
 
     adapter = AzureOpenAIChatAdapter(
         {"deployment": "gpt-4o-mini", "endpoint": "https://example", "api_version": "2024-05-01"}
@@ -204,7 +204,7 @@ def test_azure_embeddings_adapter_builds_client(monkeypatch: pytest.MonkeyPatch)
             calls["kwargs"] = kwargs
 
     monkeypatch.setitem(sys.modules, "langchain_openai", SimpleNamespace(AzureOpenAIEmbeddings=DummyAzureEmbeddings))
-    _install_stub(monkeypatch, "rag_bench.providers.azure.embeddings.is_installed")
+    _install_stub(monkeypatch, "rag_bencher.providers.azure.embeddings.is_installed")
 
     adapter = AzureOpenAIEmbeddingsAdapter(
         {"deployment": "text-embedding-3-large", "endpoint": "https://emb", "api_version": "2024-05-01"}
@@ -227,7 +227,7 @@ def test_azure_embeddings_adapter_uses_defaults(monkeypatch: pytest.MonkeyPatch)
             calls["kwargs"] = kwargs
 
     monkeypatch.setitem(sys.modules, "langchain_openai", SimpleNamespace(AzureOpenAIEmbeddings=DummyAzureEmbeddings))
-    _install_stub(monkeypatch, "rag_bench.providers.azure.embeddings.is_installed")
+    _install_stub(monkeypatch, "rag_bencher.providers.azure.embeddings.is_installed")
 
     adapter = AzureOpenAIEmbeddingsAdapter({"endpoint": "https://default"})
     adapter.to_langchain()
@@ -244,7 +244,7 @@ def test_azure_embeddings_adapter_requires_endpoint(monkeypatch: pytest.MonkeyPa
         pass
 
     monkeypatch.setitem(sys.modules, "langchain_openai", SimpleNamespace(AzureOpenAIEmbeddings=DummyAzureEmbeddings))
-    _install_stub(monkeypatch, "rag_bench.providers.azure.embeddings.is_installed")
+    _install_stub(monkeypatch, "rag_bencher.providers.azure.embeddings.is_installed")
 
     adapter = AzureOpenAIEmbeddingsAdapter({})
     with pytest.raises(ValueError, match="requires endpoint"):
@@ -252,16 +252,16 @@ def test_azure_embeddings_adapter_requires_endpoint(monkeypatch: pytest.MonkeyPa
 
 
 def test_azure_chat_adapter_requires_install(monkeypatch: pytest.MonkeyPatch) -> None:
-    _fail_install(monkeypatch, "rag_bench.providers.azure.chat.is_installed")
+    _fail_install(monkeypatch, "rag_bencher.providers.azure.chat.is_installed")
     adapter = AzureOpenAIChatAdapter({"endpoint": "https://example"})
-    with pytest.raises(RuntimeError, match="Install: rag-bench\\[azure]"):
+    with pytest.raises(RuntimeError, match="Install: rag-bencher\\[azure]"):
         adapter.to_langchain()
 
 
 def test_azure_embeddings_adapter_requires_install(monkeypatch: pytest.MonkeyPatch) -> None:
-    _fail_install(monkeypatch, "rag_bench.providers.azure.embeddings.is_installed")
+    _fail_install(monkeypatch, "rag_bencher.providers.azure.embeddings.is_installed")
     adapter = AzureOpenAIEmbeddingsAdapter({"endpoint": "https://example"})
-    with pytest.raises(RuntimeError, match="Install: rag-bench\\[azure]"):
+    with pytest.raises(RuntimeError, match="Install: rag-bencher\\[azure]"):
         adapter.to_langchain()
 
 
@@ -273,7 +273,7 @@ def test_vertex_chat_adapter_builds_client(monkeypatch: pytest.MonkeyPatch) -> N
             calls["kwargs"] = kwargs
 
     monkeypatch.setitem(sys.modules, "langchain_google_vertexai", SimpleNamespace(ChatVertexAI=DummyVertexChat))
-    _install_stub(monkeypatch, "rag_bench.providers.gcp.chat.is_installed")
+    _install_stub(monkeypatch, "rag_bencher.providers.gcp.chat.is_installed")
 
     adapter = VertexChatAdapter({"model": "gemini", "location": "europe-west1", "project_id": "proj"})
     chat = adapter.to_langchain()
@@ -292,7 +292,7 @@ def test_vertex_embeddings_adapter_supports_model_name_signature(monkeypatch: py
     monkeypatch.setitem(
         sys.modules, "langchain_google_vertexai", SimpleNamespace(VertexAIEmbeddings=DummyVertexEmbeddings)
     )
-    _install_stub(monkeypatch, "rag_bench.providers.gcp.embeddings.is_installed")
+    _install_stub(monkeypatch, "rag_bencher.providers.gcp.embeddings.is_installed")
 
     adapter = VertexEmbeddingsAdapter(
         {"model": "text-embedding-004", "location": "asia-northeast1", "project_id": "proj"}
@@ -317,7 +317,7 @@ def test_vertex_embeddings_adapter_supports_model_signature(monkeypatch: pytest.
     monkeypatch.setitem(
         sys.modules, "langchain_google_vertexai", SimpleNamespace(VertexAIEmbeddings=DummyVertexEmbeddings)
     )
-    _install_stub(monkeypatch, "rag_bench.providers.gcp.embeddings.is_installed")
+    _install_stub(monkeypatch, "rag_bencher.providers.gcp.embeddings.is_installed")
 
     adapter = VertexEmbeddingsAdapter({"project_id": None})
     emb = adapter.to_langchain()
@@ -327,16 +327,16 @@ def test_vertex_embeddings_adapter_supports_model_signature(monkeypatch: pytest.
 
 
 def test_vertex_chat_adapter_requires_install(monkeypatch: pytest.MonkeyPatch) -> None:
-    _fail_install(monkeypatch, "rag_bench.providers.gcp.chat.is_installed")
+    _fail_install(monkeypatch, "rag_bencher.providers.gcp.chat.is_installed")
     adapter = VertexChatAdapter({})
-    with pytest.raises(RuntimeError, match="Install: rag-bench\\[gcp]"):
+    with pytest.raises(RuntimeError, match="Install: rag-bencher\\[gcp]"):
         adapter.to_langchain()
 
 
 def test_vertex_embeddings_adapter_requires_install(monkeypatch: pytest.MonkeyPatch) -> None:
-    _fail_install(monkeypatch, "rag_bench.providers.gcp.embeddings.is_installed")
+    _fail_install(monkeypatch, "rag_bencher.providers.gcp.embeddings.is_installed")
     adapter = VertexEmbeddingsAdapter({})
-    with pytest.raises(RuntimeError, match="Install: rag-bench\\[gcp]"):
+    with pytest.raises(RuntimeError, match="Install: rag-bencher\\[gcp]"):
         adapter.to_langchain()
 
 

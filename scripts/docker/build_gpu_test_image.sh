@@ -10,8 +10,8 @@ fi
 # Default to a regional Artifact Registry repo close to the GPU VMs.
 GCP_PROJECT="${GCP_PROJECT:-gpu-test-runners}"
 GCP_ARTIFACT_REGION="${GCP_ARTIFACT_REGION:-us-central1}"
-REPOSITORY="${REPOSITORY:-rag-bench}"
-PACKAGE="${PACKAGE:-rag-bench-gpu-tests}"
+REPOSITORY="${REPOSITORY:-rag-bencher}"
+PACKAGE="${PACKAGE:-rag-bencher-gpu-tests}"
 IMAGE_VERSION="$(git rev-parse --short HEAD 2>/dev/null || date +%Y%m%d%H%M)"
 
 IMAGE_REF="${GCP_ARTIFACT_REGION}-docker.pkg.dev/${GCP_PROJECT}/${REPOSITORY}/${PACKAGE}:${IMAGE_VERSION}"

@@ -16,7 +16,7 @@ def _require() -> Type["AzureSearch"]:
 
         return AzureSearch
     except Exception as e:
-        raise RuntimeError("Azure AI Search requires azure-search-documents (install rag-bench[azure])") from e
+        raise RuntimeError("Azure AI Search requires azure-search-documents (install rag-bencher[azure])") from e
 
 
 class AzureAISearchBackend:

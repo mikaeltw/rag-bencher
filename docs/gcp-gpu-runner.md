@@ -1,9 +1,9 @@
 # Running GPU workflows on GCP via Cirun
 
-The GPU job defined in `.github/workflows/_gpu.yml` runs entirely inside a container that has all rag-bench dependencies pre-installed. This document explains how to build and store:
+The GPU job defined in `.github/workflows/_gpu.yml` runs entirely inside a container that has all rag-bencher dependencies pre-installed. This document explains how to build and store:
 
 1. A GCE VM image that already contains Docker and the NVIDIA Container Toolkit so Cirun can boot a runner quickly.
-2. A GPU-enabled container image that bundles rag-bench plus its dev tooling so `_gpu.yml` can run the existing tox workflow inside the container.
+2. A GPU-enabled container image that bundles rag-bencher plus its dev tooling so `_gpu.yml` can run the existing tox workflow inside the container.
 
 ## Prerequisites
 
@@ -26,8 +26,8 @@ The GPU job defined in `.github/workflows/_gpu.yml` runs entirely inside a conta
     GCP_ARTIFACT_REGION=us-central1
     GCP_PROJECT=gpu-test-runners
     IMAGE_VERSION (no default, will be picked up by default when building)
-    PACKAGE=rag-bench-gpu-tests
-    REPOSITORY=rag-bench
+    PACKAGE=rag-bencher-gpu-tests
+    REPOSITORY=rag-bencher
     GCP_ZONE (no default but strongly advised to use a zone in the same region as the artifact store)
     ```
 
@@ -39,20 +39,20 @@ The GPU job defined in `.github/workflows/_gpu.yml` runs entirely inside a conta
    ./scripts/gcp/build_gpu_base_image.sh
    ```
 
-   The helper script provisions a temporary GPU VM based on Ubuntu 22.04, copies `scripts/gcp/install_gpu_host.sh` to it, runs the installer (Docker, NVIDIA driver 550, NVIDIA container toolkit) and saves the stopped disk as a reusable image family (`rag-bench-gpu-host` by default). The builder VM defaults to a smaller machine/boot disk and preemptible pricing; override via `MACHINE_TYPE`, `BOOT_DISK_SIZE` or `PREEMPTIBLE`. Set `IMAGE_NAME`, `IMAGE_FAMILY`, `GPU_TYPE`, etc. to override the other defaults.
+   The helper script provisions a temporary GPU VM based on Ubuntu 22.04, copies `scripts/gcp/install_gpu_host.sh` to it, runs the installer (Docker, NVIDIA driver 550, NVIDIA container toolkit) and saves the stopped disk as a reusable image family (`rag-bencher-gpu-host` by default). The builder VM defaults to a smaller machine/boot disk and preemptible pricing; override via `MACHINE_TYPE`, `BOOT_DISK_SIZE` or `PREEMPTIBLE`. Set `IMAGE_NAME`, `IMAGE_FAMILY`, `GPU_TYPE`, etc. to override the other defaults.
 
 2. Verify the image is stored in your project:
 
    ```bash
-   gcloud compute images list --filter="name~'rag-bench-gpu-host'"
+   gcloud compute images list --filter="name~'rag-bencher-gpu-host'"
    ```
 
 3. (Optional) Export the image to Cloud Storage if you need to keep an archive or share it across projects:
 
    ```bash
    gcloud compute images export \
-     --image rag-bench-gpu-host \
-     --destination-uri gs://my-bucket/rag-bench-gpu-host.tar.gz
+     --image rag-bencher-gpu-host \
+     --destination-uri gs://my-bucket/rag-bencher-gpu-host.tar.gz
    ```
 
    You can later re-import the archive into another project with `gcloud compute images import`.
@@ -67,7 +67,7 @@ runners:
     cloud: gcp
     gpu: nvidia-tesla-t4
     instance_type: n1-standard-4
-    machine_image: projects/gpu-test-runners/global/images/family/rag-bench-gpu-host
+    machine_image: projects/gpu-test-runners/global/images/family/rag-bencher-gpu-host
     preemptible: true
     region: us-central1-b
 
@@ -88,12 +88,12 @@ runners:
 
 Cirun will now boot runners from your preconfigured image, so the VM already has Docker plus the correct NVIDIA runtime when the GitHub Actions job starts. Adjust the resource labels to match `.github/workflows/_gpu.yml` (`[self-hosted, cirun, linux, x64, gpu, gcp]`).
 
-## Build and publish the rag-bench GPU test container
+## Build and publish the rag-bencher GPU test container
 
 1. Build the container that runs the tox workflow (Remember to change env vars for your settings):
 
    ```bash
-   GCP_PROJECT="gpu-test-runners" GCP_ARTIFACT_REGION="us-central1" PACKAGE="rag-bench-gpu-tests" REPOSITORY="rag-bench" ./scripts/docker/build_gpu_test_image.sh
+   GCP_PROJECT="gpu-test-runners" GCP_ARTIFACT_REGION="us-central1" PACKAGE="rag-bencher-gpu-tests" REPOSITORY="rag-bencher" ./scripts/docker/build_gpu_test_image.sh
    ```
 
    By default it builds with a split CUDA base to keep the final image smaller: `nvidia/cuda:12.3.2-cudnn9-devel-ubuntu22.04` for the build stage and `nvidia/cuda:12.3.2-cudnn9-runtime-ubuntu22.04` for the runtime stage. Override via `CUDA_IMAGE_DEVEL=...` and `CUDA_IMAGE_RUNTIME=...`. The Dockerfile at `docker/gpu-tests.Dockerfile` installs uv, copies the repo and relies on the runtime entrypoint to execute `make setup && make sync && make test-all-gpu` (the same sequence used in `_gpu.yml`). Dependencies download during `make sync` inside the container and land in the mounted cache directories, so subsequent workflow runs reuse them.
@@ -124,7 +124,7 @@ The `_gpu.yml` workflow now calls `scripts/docker/run_gpu_tests.sh`, which:
 You can also use the script locally:
 
 ```bash
-GCP_PROJECT="gpu-test-runners" GCP_ARTIFACT_REGION="us-central1" PACKAGE="rag-bench-gpu-tests" REPOSITORY="rag-bench" IMAGE_VERSION="Your image version tag" ./scripts/docker/run_gpu_tests.sh
+GCP_PROJECT="gpu-test-runners" GCP_ARTIFACT_REGION="us-central1" PACKAGE="rag-bencher-gpu-tests" REPOSITORY="rag-bencher" IMAGE_VERSION="Your image version tag" ./scripts/docker/run_gpu_tests.sh
 ```
 
 Override the command to run ad-hoc checks (for example, `./scripts/docker/run_gpu_tests.sh bash -lc "pytest tests/gpu -k cache"`).
@@ -134,4 +134,4 @@ Override the command to run ad-hoc checks (for example, `./scripts/docker/run_gp
 - **Host VM image** – lives as a Compute Engine image (and optional Cloud Storage export) inside your GCP project. Cirun references it via the image family.
 - **GPU test container** – stored in GCP Artifact Registry in the same region as your GPU runners for low-latency pulls. Use `GCP_ZONE`/`GCP_ARTIFACT_REGION` to control the exact location.
 
-With these scripts plus the updated workflow, Cirun can boot a GPU VM that immediately runs the rag-bench GPU tox suite inside the prepared container while reusing GitHub Action caches for dependencies and model weights. The host image includes a boot-time service that, if it detects a local SSD (e.g., GCE NVMe local-ssd), will format/mount it at `/mnt/local-ssd` and set Docker’s `data-root` there so image extraction uses NVMe bandwidth. Attach a local SSD to runner VMs (and ensure the service account has Artifact Registry pull access) for the best pull times.
+With these scripts plus the updated workflow, Cirun can boot a GPU VM that immediately runs the rag-bencher GPU tox suite inside the prepared container while reusing GitHub Action caches for dependencies and model weights. The host image includes a boot-time service that, if it detects a local SSD (e.g., GCE NVMe local-ssd), will format/mount it at `/mnt/local-ssd` and set Docker’s `data-root` there so image extraction uses NVMe bandwidth. Attach a local SSD to runner VMs (and ensure the service account has Artifact Registry pull access) for the best pull times.

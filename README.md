@@ -1,10 +1,10 @@
-# rag-bench
+# rag-bencher
 
 ![Python Versions](https://img.shields.io/badge/Python-3.12%20%7C%203.13%20%7C%203.14-blue?logo=python)
-[![CI](https://github.com/mikaeltw/rag-bench/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mikaeltw/rag-bench/actions/workflows/ci.yml)
-[![Lint & Typecheck](https://github.com/mikaeltw/rag-bench/actions/workflows/lint-type-check.yml/badge.svg?branch=main)](https://github.com/mikaeltw/rag-bench/actions/workflows/lint-type-check.yml)
-[![Coverage Status](https://img.shields.io/coveralls/github/mikaeltw/rag-bench?branch=main&logo=coveralls)](https://coveralls.io/github/mikaeltw/rag-bench?branch=main)
-[![PyPI](https://img.shields.io/pypi/v/rag-bench.svg?logo=pypi&flat)](https://pypi.org/project/rag-bench/)
+[![CI](https://github.com/mikaeltw/rag-bencher/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mikaeltw/rag-bencher/actions/workflows/ci.yml)
+[![Lint & Typecheck](https://github.com/mikaeltw/rag-bencher/actions/workflows/lint-type-check.yml/badge.svg?branch=main)](https://github.com/mikaeltw/rag-bencher/actions/workflows/lint-type-check.yml)
+[![Coverage Status](https://img.shields.io/coveralls/github/mikaeltw/rag-bencher?branch=main&logo=coveralls)](https://coveralls.io/github/mikaeltw/rag-bencher?branch=main)
+[![PyPI](https://img.shields.io/pypi/v/rag-bencher.svg?logo=pypi&flat)](https://pypi.org/project/rag-bencher/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Reproducible retrieval-augmented generation (RAG) baselines and an evaluation harness that makes it easy to compare pipelines across providers. Configure a pipeline in YAML, run one command, and collect HTML reports that stay consistent across experiments.
@@ -27,23 +27,23 @@ Requirements: Python 3.12–3.14.
 
 ### PyPI
 ```bash
-pip install rag-bench
+pip install rag-bencher
 # or using uv
-uv pip install rag-bench
+uv pip install rag-bencher
 ```
 
 ### Provider and vector extras
 ```bash
-pip install "rag-bench[gcp]"    # Vertex AI chat + Matching Engine
-pip install "rag-bench[aws]"    # Bedrock chat + OpenSearch vector
-pip install "rag-bench[azure]"  # Azure OpenAI chat + Azure AI Search
-pip install "rag-bench[providers]"  # installs all provider extras
+pip install "rag-bencher[gcp]"    # Vertex AI chat + Matching Engine
+pip install "rag-bencher[aws]"    # Bedrock chat + OpenSearch vector
+pip install "rag-bencher[azure]"  # Azure OpenAI chat + Azure AI Search
+pip install "rag-bencher[providers]"  # installs all provider extras
 ```
 
 ### From source (development)
 ```bash
-git clone https://github.com/mikaeltw/rag-bench.git
-cd rag-bench
+git clone https://github.com/mikaeltw/rag-bencher.git
+cd rag-bencher
 python -m venv venv && source venv/bin/activate
 pip install -e .[dev]
 # or use uv + tox via Makefile helpers
@@ -59,12 +59,12 @@ The helper targets download dependencies; populate wheels locally if your networ
 ```bash
 python scripts/run.py --config configs/wiki.yaml --question "What is LangChain?"
 # or, when installed as a package
-python -m rag_bench.cli --config configs/wiki.yaml --question "What is LangChain?"
+python -m rag_bencher.cli --config configs/wiki.yaml --question "What is LangChain?"
 ```
 
 ### Compare two configs via CLI
 ```bash
-python -m rag_bench.bench_many_cli \
+python -m rag_bencher.bench_many_cli \
   --configs "configs/*.yaml" \
   --qa examples/qa/toy.jsonl
 ```
@@ -74,10 +74,10 @@ Generates an HTML summary under `reports/summary-*.html` so you can scan relativ
 ```python
 from pathlib import Path
 
-from rag_bench.config import load_config
-from rag_bench.eval.dataset_loader import load_texts_as_documents
-from rag_bench.eval.metrics import bow_cosine, context_recall, lexical_f1
-from rag_bench.pipelines.selector import select_pipeline
+from rag_bencher.config import load_config
+from rag_bencher.eval.dataset_loader import load_texts_as_documents
+from rag_bencher.eval.metrics import bow_cosine, context_recall, lexical_f1
+from rag_bencher.pipelines.selector import select_pipeline
 
 qa_examples = [
     {"question": "What is LangChain?", "reference_answer": "A Python framework for building LLM apps."},
@@ -141,12 +141,12 @@ for cfg in ("configs/wiki.yaml", "configs/rerank.yaml"):
 - Provider configs pull credentials from environment variables; see `configs/providers/` for examples.
 
 ## Architecture overview
-- **CLI entrypoints:** `rag_bench.cli` (single question), `rag_bench.bench_cli` (single-config benchmarking), `rag_bench.bench_many_cli` (multi-config comparisons).
-- **Config layer:** `rag_bench.config.BenchConfig` validates YAML and wires provider/vector extras.
-- **Pipeline builders:** `rag_bench.pipelines.*` assemble LangChain runnables for naive, multi-query, HyDE, and rerank flows.
-- **Evaluation:** `rag_bench.eval.*` loads datasets, computes metrics, and writes HTML reports.
-- **Providers/vectors:** adapters under `rag_bench.providers` and `rag_bench.vector` wrap cloud services while preserving the same interface.
-- **Reproducibility:** caches answers in `.ragbench_cache/`, sets seeds, and keeps reports in `reports/`.
+- **CLI entrypoints:** `rag_bencher.cli` (single question), `rag_bencher.bench_cli` (single-config benchmarking), `rag_bencher.bench_many_cli` (multi-config comparisons).
+- **Config layer:** `rag_bencher.config.BenchConfig` validates YAML and wires provider/vector extras.
+- **Pipeline builders:** `rag_bencher.pipelines.*` assemble LangChain runnables for naive, multi-query, HyDE, and rerank flows.
+- **Evaluation:** `rag_bencher.eval.*` loads datasets, computes metrics, and writes HTML reports.
+- **Providers/vectors:** adapters under `rag_bencher.providers` and `rag_bencher.vector` wrap cloud services while preserving the same interface.
+- **Reproducibility:** caches answers in `.ragbencher_cache/`, sets seeds, and keeps reports in `reports/`.
 
 ## Roadmap / future work
 - Add more provider smoke tests and CI examples.

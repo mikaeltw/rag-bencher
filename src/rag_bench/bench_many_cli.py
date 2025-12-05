@@ -7,10 +7,10 @@ from typing import Any, Dict, Iterator
 
 from rich.console import Console
 
-from rag_bench.config import load_config
-from rag_bench.eval.dataset_loader import load_texts_as_documents
-from rag_bench.eval.metrics import bow_cosine, context_recall, lexical_f1
-from rag_bench.pipelines.selector import PipelineSelection, select_pipeline
+from rag_bencher.config import load_config
+from rag_bencher.eval.dataset_loader import load_texts_as_documents
+from rag_bencher.eval.metrics import bow_cosine, context_recall, lexical_f1
+from rag_bencher.pipelines.selector import PipelineSelection, select_pipeline
 
 console = Console()
 
@@ -76,14 +76,14 @@ def main() -> None:
     )
     html = (
         f"<!doctype html><html><head><meta charset='utf-8'>"
-        f"<title>rag-bench multi-run</title>"
+        f"<title>rag-bencher multi-run</title>"
         f"<style>"
         f"body{{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;"
         f"max-width:1000px;margin:2rem auto;padding:0 1rem}}"
         f"table{{border-collapse:collapse;width:100%}}"
         f"th,td{{border:1px solid #ddd;padding:8px}}"
         f"</style></head><body>"
-        f"<h1>rag-bench multi-run summary</h1>"
+        f"<h1>rag-bencher multi-run summary</h1>"
         f"<table><thead><tr>"
         f"<th>Config</th><th>Pipeline</th><th>Lexical F1</th>"
         f"<th>BoW Cosine</th><th>Context Recall</th>"

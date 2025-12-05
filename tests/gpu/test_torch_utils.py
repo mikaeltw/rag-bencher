@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 
-from rag_bench.utils import factories, torch_utils
+from rag_bencher.utils import factories, torch_utils
 
 pytestmark = pytest.mark.gpu
 

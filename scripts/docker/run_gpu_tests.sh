@@ -4,8 +4,8 @@ set -euo pipefail
 
 GCP_ARTIFACT_REGION="${GCP_ARTIFACT_REGION:-us-central1}"
 GCP_PROJECT="${GCP_PROJECT:-gpu-test-runners}"
-REPOSITORY="${REPOSITORY:-rag-bench}"
-PACKAGE="${PACKAGE:-rag-bench-gpu-tests}"
+REPOSITORY="${REPOSITORY:-rag-bencher}"
+PACKAGE="${PACKAGE:-rag-bencher-gpu-tests}"
 IMAGE_VERSION="${IMAGE_VERSION:-latest}"
 
 IMAGE_REF="${GCP_ARTIFACT_REGION}-docker.pkg.dev/${GCP_PROJECT}/${REPOSITORY}/${PACKAGE}:${IMAGE_VERSION}"

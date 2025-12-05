@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from rag_bench.eval import datasets
+from rag_bencher.eval import datasets
 
 pytestmark = pytest.mark.gpu
 

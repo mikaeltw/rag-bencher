@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from typing import Any, Final, Optional
 
-D: Final[Path] = Path(".ragbench_cache")
+D: Final[Path] = Path(".ragbencher_cache")
 D.mkdir(exist_ok=True, parents=True)
 
 

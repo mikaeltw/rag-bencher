@@ -22,7 +22,7 @@ jobs:
       - name: Install uv & tox
         run: make setup
 
-      - name: Sync rag-bench deps
+      - name: Sync rag-bencher deps
         run: make sync
 
       - name: Run tests via tox (uv backend)

@@ -8,14 +8,14 @@ from langchain_core.retrievers import BaseRetriever
 from langchain_core.runnables import RunnableSerializable
 from rich.console import Console
 
-from rag_bench.config import BenchConfig, load_config
-from rag_bench.eval.dataset_loader import load_texts_as_documents
-from rag_bench.pipelines import naive_rag
-from rag_bench.providers.base import build_chat_adapter, build_embeddings_adapter
-from rag_bench.utils.cache import cache_get, cache_set
-from rag_bench.utils.callbacks.usage import UsageTracker
-from rag_bench.utils.repro import set_seeds
-from rag_bench.vector.base import VectorBackend, build_vector_backend
+from rag_bencher.config import BenchConfig, load_config
+from rag_bencher.eval.dataset_loader import load_texts_as_documents
+from rag_bencher.pipelines import naive_rag
+from rag_bencher.providers.base import build_chat_adapter, build_embeddings_adapter
+from rag_bencher.utils.cache import cache_get, cache_set
+from rag_bencher.utils.callbacks.usage import UsageTracker
+from rag_bencher.utils.repro import set_seeds
+from rag_bencher.vector.base import VectorBackend, build_vector_backend
 
 console = Console()
 

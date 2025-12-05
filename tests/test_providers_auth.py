@@ -7,9 +7,9 @@ from typing import Any, Callable
 
 import pytest
 
-from rag_bench.providers.aws import auth as aws_auth
-from rag_bench.providers.azure import auth as azure_auth
-from rag_bench.providers.gcp import auth as gcp_auth
+from rag_bencher.providers.aws import auth as aws_auth
+from rag_bencher.providers.azure import auth as azure_auth
+from rag_bencher.providers.gcp import auth as gcp_auth
 
 pytestmark = [pytest.mark.unit, pytest.mark.offline]
 

@@ -8,7 +8,7 @@ from typing import Any, cast
 
 import pytest
 
-from rag_bench.utils import torch_utils
+from rag_bencher.utils import torch_utils
 
 
 @pytest.mark.gpu

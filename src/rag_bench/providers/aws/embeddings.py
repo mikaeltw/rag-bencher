@@ -15,7 +15,7 @@ class BedrockEmbeddingsAdapter:
 
     def to_langchain(self) -> "BedrockEmbeddings":
         if not is_installed():
-            raise RuntimeError("Install: rag-bench[aws]")
+            raise RuntimeError("Install: rag-bencher[aws]")
         from langchain_aws import BedrockEmbeddings
 
         return BedrockEmbeddings(

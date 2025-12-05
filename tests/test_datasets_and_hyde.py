@@ -1,7 +1,7 @@
 import pytest
 
-from rag_bench.eval.datasets import load_dataset
-from rag_bench.pipelines.hyde import build_chain
+from rag_bencher.eval.datasets import load_dataset
+from rag_bencher.pipelines.hyde import build_chain
 
 pytestmark = [pytest.mark.unit, pytest.mark.offline]
 

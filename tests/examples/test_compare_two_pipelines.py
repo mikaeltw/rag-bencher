@@ -7,8 +7,8 @@ from typing import Any, Tuple, cast
 import pytest
 from langchain_core.runnables import RunnableSerializable
 
-from rag_bench.config import BenchConfig, DataCfg, ModelCfg, RetrieverCfg
-from rag_bench.pipelines.selector import PipelineSelection
+from rag_bencher.config import BenchConfig, DataCfg, ModelCfg, RetrieverCfg
+from rag_bencher.pipelines.selector import PipelineSelection
 
 
 class _DummyChain:
@@ -83,25 +83,25 @@ def _run_main_with_stubbed_modules(
     repo_root = Path(__file__).resolve().parents[2]
     monkeypatch.syspath_prepend(str(repo_root))
 
-    rb_pkg = ModuleType("rag_bench")
+    rb_pkg = ModuleType("rag_bencher")
     rb_pkg.__path__ = []
-    rb_eval = ModuleType("rag_bench.eval")
+    rb_eval = ModuleType("rag_bencher.eval")
     rb_eval.__path__ = []
-    rb_pipelines = ModuleType("rag_bench.pipelines")
+    rb_pipelines = ModuleType("rag_bencher.pipelines")
     rb_pipelines.__path__ = []
 
-    cfg_mod = ModuleType("rag_bench.config")
+    cfg_mod = ModuleType("rag_bencher.config")
     cfg_mod.load_config = lambda _path: "cfg"  # type: ignore[attr-defined]
 
-    dl_mod = ModuleType("rag_bench.eval.dataset_loader")
+    dl_mod = ModuleType("rag_bencher.eval.dataset_loader")
     dl_mod.load_texts_as_documents = lambda _paths: ["doc"]  # type: ignore[attr-defined]
 
-    metrics_mod = ModuleType("rag_bench.eval.metrics")
+    metrics_mod = ModuleType("rag_bencher.eval.metrics")
     metrics_mod.lexical_f1 = lambda *_args, **_kwargs: 1.0  # type: ignore[attr-defined]
     metrics_mod.bow_cosine = lambda *_args, **_kwargs: 1.0  # type: ignore[attr-defined]
     metrics_mod.context_recall = lambda *_args, **_kwargs: 1.0  # type: ignore[attr-defined]
 
-    selector_mod = ModuleType("rag_bench.pipelines.selector")
+    selector_mod = ModuleType("rag_bencher.pipelines.selector")
 
     class _Sel:
         def __init__(self) -> None:
@@ -111,13 +111,13 @@ def _run_main_with_stubbed_modules(
 
     selector_mod.select_pipeline = lambda *_args, **_kwargs: _Sel()  # type: ignore[attr-defined]
 
-    monkeypatch.setitem(sys.modules, "rag_bench", rb_pkg)
-    monkeypatch.setitem(sys.modules, "rag_bench.config", cfg_mod)
-    monkeypatch.setitem(sys.modules, "rag_bench.eval", rb_eval)
-    monkeypatch.setitem(sys.modules, "rag_bench.eval.dataset_loader", dl_mod)
-    monkeypatch.setitem(sys.modules, "rag_bench.eval.metrics", metrics_mod)
-    monkeypatch.setitem(sys.modules, "rag_bench.pipelines", rb_pipelines)
-    monkeypatch.setitem(sys.modules, "rag_bench.pipelines.selector", selector_mod)
+    monkeypatch.setitem(sys.modules, "rag_bencher", rb_pkg)
+    monkeypatch.setitem(sys.modules, "rag_bencher.config", cfg_mod)
+    monkeypatch.setitem(sys.modules, "rag_bencher.eval", rb_eval)
+    monkeypatch.setitem(sys.modules, "rag_bencher.eval.dataset_loader", dl_mod)
+    monkeypatch.setitem(sys.modules, "rag_bencher.eval.metrics", metrics_mod)
+    monkeypatch.setitem(sys.modules, "rag_bencher.pipelines", rb_pipelines)
+    monkeypatch.setitem(sys.modules, "rag_bencher.pipelines.selector", selector_mod)
 
     monkeypatch.setenv("RAG_BENCH_DEVICE", device)
     sys.modules.pop("examples.compare_two_pipelines", None)

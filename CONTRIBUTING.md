@@ -1,5 +1,5 @@
 
-# Contributing to rag-bench
+# Contributing to rag-bencher
 
 Thanks for considering a contribution!
 
@@ -21,7 +21,7 @@ Thanks for considering a contribution!
 - Small, focused PRs are easier to review than sweeping changes.
 
 ## Adding a new pipeline or backend
-1. Add pipeline logic under `src/rag_bench/pipelines/` or a provider/vector adapter under `src/rag_bench/providers` / `src/rag_bench/vector`.
+1. Add pipeline logic under `src/rag_bencher/pipelines/` or a provider/vector adapter under `src/rag_bencher/providers` / `src/rag_bencher/vector`.
 2. Supply a config in `configs/` (or `configs/providers/`) showing how to enable it.
 3. Cover it with tests in `tests/` (prefer offline fixtures; keep GPU-tagged tests separate).
 4. Update documentation: README quickstart, `docs/architecture.md`, and example references as needed.

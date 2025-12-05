@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from rag_bench.utils import cache
+from rag_bencher.utils import cache
 
 
 @pytest.mark.offline

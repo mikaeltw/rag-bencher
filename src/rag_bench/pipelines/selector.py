@@ -6,12 +6,12 @@ from typing import Any, Callable, Mapping, Optional
 from langchain_core.documents import Document
 from langchain_core.runnables import RunnableSerializable
 
-from rag_bench.config import BenchConfig, load_config
-from rag_bench.pipelines import hyde as hy
-from rag_bench.pipelines import multi_query as mq
-from rag_bench.pipelines import naive_rag
-from rag_bench.pipelines import rerank as rr
-from rag_bench.providers.base import build_chat_adapter, build_embeddings_adapter
+from rag_bencher.config import BenchConfig, load_config
+from rag_bencher.pipelines import hyde as hy
+from rag_bencher.pipelines import multi_query as mq
+from rag_bencher.pipelines import naive_rag
+from rag_bencher.pipelines import rerank as rr
+from rag_bencher.providers.base import build_chat_adapter, build_embeddings_adapter
 
 
 @dataclass(frozen=True)

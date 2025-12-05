@@ -4,7 +4,7 @@ from pathlib import Path
 
 from langchain_core.documents import Document
 
-from rag_bench.eval.dataset_loader import load_texts_as_documents
+from rag_bencher.eval.dataset_loader import load_texts_as_documents
 
 DATASETS_ROOT = Path("examples/datasets")
 

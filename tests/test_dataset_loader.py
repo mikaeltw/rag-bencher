@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from rag_bench.eval import dataset_loader
-from rag_bench.eval import datasets as dataset_mod
+from rag_bencher.eval import dataset_loader
+from rag_bencher.eval import datasets as dataset_mod
 
 pytestmark = [pytest.mark.unit, pytest.mark.offline]
 

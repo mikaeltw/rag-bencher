@@ -1,6 +1,6 @@
 import pytest
 
-from rag_bench.eval.metrics import bow_cosine, context_recall, lexical_f1
+from rag_bencher.eval.metrics import bow_cosine, context_recall, lexical_f1
 
 pytestmark = pytest.mark.unit
 

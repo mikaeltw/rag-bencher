@@ -9,7 +9,7 @@ import pytest
 from langchain_core.documents import Document
 from langchain_core.runnables import RunnableLambda
 
-from rag_bench import cli
+from rag_bencher import cli
 
 pytestmark = [pytest.mark.unit, pytest.mark.offline]
 
@@ -81,7 +81,7 @@ def test_cli_main_runs_chain_on_cache_miss(monkeypatch: pytest.MonkeyPatch) -> N
     docs = [Document(page_content="doc", metadata={"source": "doc.txt"})]
     chain = DummyChain()
     cache_log = _patch_common(monkeypatch, cfg, docs, chain)
-    monkeypatch.setattr(sys, "argv", ["rag-bench", "--config", "cfg.yaml", "--question", "What is RAG?"])
+    monkeypatch.setattr(sys, "argv", ["rag-bencher", "--config", "cfg.yaml", "--question", "What is RAG?"])
 
     cli.main()
 
@@ -96,7 +96,7 @@ def test_cli_main_leaves_device_env_when_auto(monkeypatch: pytest.MonkeyPatch) -
     docs = [Document(page_content="doc", metadata={"source": "doc.txt"})]
     chain = DummyChain()
     _patch_common(monkeypatch, cfg, docs, chain)
-    monkeypatch.setattr(sys, "argv", ["rag-bench", "--config", "cfg.yaml", "--question", "Auto?"])
+    monkeypatch.setattr(sys, "argv", ["rag-bencher", "--config", "cfg.yaml", "--question", "Auto?"])
     monkeypatch.delenv("RAG_BENCH_DEVICE", raising=False)
     monkeypatch.delenv("CUDA_VISIBLE_DEVICES", raising=False)
 
@@ -121,7 +121,7 @@ def test_cli_main_returns_cached_answer(monkeypatch: pytest.MonkeyPatch) -> None
         lambda *args, **kwargs: (chain, lambda: {"pipeline": "naive"}),
     )
 
-    monkeypatch.setattr(sys, "argv", ["rag-bench", "--config", "cfg.yaml", "--question", "Cached Q?"])
+    monkeypatch.setattr(sys, "argv", ["rag-bencher", "--config", "cfg.yaml", "--question", "Cached Q?"])
 
     def fake_get(model: str, prompt: str) -> str:
         return "cached-answer"
@@ -155,7 +155,7 @@ def test_cli_main_skips_embeddings_when_adapter_missing(monkeypatch: pytest.Monk
         return None
 
     monkeypatch.setattr(cli, "build_embeddings_adapter", build_adapter)
-    monkeypatch.setattr(sys, "argv", ["rag-bench", "--config", "cfg.yaml", "--question", "No embeddings?"])
+    monkeypatch.setattr(sys, "argv", ["rag-bencher", "--config", "cfg.yaml", "--question", "No embeddings?"])
 
     cli.main()
 
@@ -437,7 +437,7 @@ def test_cli_main_sets_cuda_device_and_handles_vector_failure(monkeypatch: pytes
         sys,
         "argv",
         [
-            "rag-bench",
+            "rag-bencher",
             "--config",
             "cfg.yaml",
             "--question",

@@ -1,1 +1,1 @@
-# Examples package for rag-bench.
+# Examples package for rag-bencher.

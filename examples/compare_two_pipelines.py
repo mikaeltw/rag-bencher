@@ -1,4 +1,4 @@
-"""Compare two rag-bench configs over a small QA set.
+"""Compare two rag-bencher configs over a small QA set.
 
 Run directly:
     uv run python examples/compare_two_pipelines.py
@@ -10,10 +10,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-from rag_bench.config import load_config
-from rag_bench.eval.dataset_loader import load_texts_as_documents
-from rag_bench.eval.metrics import bow_cosine, context_recall, lexical_f1
-from rag_bench.pipelines.selector import select_pipeline
+from rag_bencher.config import load_config
+from rag_bencher.eval.dataset_loader import load_texts_as_documents
+from rag_bencher.eval.metrics import bow_cosine, context_recall, lexical_f1
+from rag_bencher.pipelines.selector import select_pipeline
 
 CONFIGS = ("configs/wiki.yaml", "configs/rerank.yaml")
 QA_EXAMPLES: List[Dict[str, str]] = [

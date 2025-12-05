@@ -4,7 +4,7 @@ requires = ["setuptools>=68", "wheel", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "rag-bench"
+name = "rag-bencher"
 dynamic = ["version"]
 description = "Reproducible RAG baselines and evaluations with LangChain"
 readme = "README.md"
@@ -37,16 +37,16 @@ dependencies = [
 ]
 
 [project.scripts]
-rag-bench-cli = "rag_bench.cli:main"
-rag-bench-cli-bench = "rag_bench.bench_cli:main"
-rag-bench-cli-bench-many = "rag_bench.bench_many_cli:main"
+rag-bencher-cli = "rag_bencher.cli:main"
+rag-bencher-cli-bench = "rag_bencher.bench_cli:main"
+rag-bencher-cli-bench-many = "rag_bencher.bench_many_cli:main"
 
 [project.optional-dependencies]
 dev = ["tox>=4.32.0", "pytest>=7.4.0", "pytest-cov>=4.1.0", "black>=24.4.0", "isort>=5.13.0", "flake8>=7.3.0", "flake8-pyproject>=1.2.3", "mypy>=1.18.2", "types-PyYAML>=6.0.12.20250915", "types-requests>=2.32.4.20250913", "types-setuptools>=80.9.0.20250822", "flake8-bugbear>=25.10.21", "flake8-comprehensions>=3.17.0", "flake8-annotations>=3.2.0", "flake8-docstrings>=1.7.0", "build", "twine"]
 gcp = ["langchain-google-vertexai>=0.1.0", "google-auth>=2.30.0"]
 aws = ["langchain-aws>=0.1.0", "boto3>=1.34.0", "botocore>=1.34.0", "opensearch-py>=2.6.0"]
 azure = ["langchain-openai>=0.1.0", "azure-identity>=1.17.0", "azure-search-documents>=11.5.1"]
-providers = ["rag-bench[gcp,aws,azure]"]
+providers = ["rag-bencher[gcp,aws,azure]"]
 
 [tool.black]
 line-length = 120
@@ -67,7 +67,7 @@ docstring-convention = "google"
 
 [tool.mypy]
 python_version = "3.12"
-packages = ["rag_bench"]
+packages = ["rag_bencher"]
 files = ["src", "examples"]
 exclude_gitignore = true
 ignore_missing_imports = true
@@ -103,7 +103,7 @@ addopts = [
 
 filterwarnings = [
   "default",
-  "error::Warning:rag_bench(\\.|$)",
+  "error::Warning:rag_bencher(\\.|$)",
   # Third party errors, which we ignore
   "ignore:.*iscoroutinefunction.*:DeprecationWarning",
 ]
@@ -116,11 +116,11 @@ source = ["."]
 
 # Normalize paths from different runners (Linux/macOS, tox, Actions)
 [tool.coverage.paths]
-rag_bench = [
-  "src/rag_bench",
-  "*/src/rag_bench",
-  ".tox/*/site-packages/rag_bench",
-  "**/site-packages/rag_bench",
+rag_bencher = [
+  "src/rag_bencher",
+  "*/src/rag_bencher",
+  ".tox/*/site-packages/rag_bencher",
+  "**/site-packages/rag_bencher",
 ]
 examples = [
   "examples",
@@ -131,7 +131,7 @@ examples = [
 show_missing = true
 skip_covered = true
 include = [
-  "src/rag_bench/*",
+  "src/rag_bencher/*",
   "examples/*",
 ]
 omit = [
@@ -145,7 +145,7 @@ omit = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["rag_bench*"]
+include = ["rag_bencher*"]
 
 [tool.setuptools_scm]
 fallback_version = "0.0.0"

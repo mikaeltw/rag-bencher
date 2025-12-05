@@ -4,7 +4,7 @@ import textwrap
 
 import pytest
 
-from rag_bench.config import load_config
+from rag_bencher.config import load_config
 
 pytestmark = [pytest.mark.unit, pytest.mark.offline]
 

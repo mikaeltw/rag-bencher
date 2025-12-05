@@ -6,7 +6,7 @@ from typing import cast
 import pytest
 from langchain_core.outputs import Generation, LLMResult
 
-from rag_bench.utils.callbacks.usage import UsageTracker
+from rag_bencher.utils.callbacks.usage import UsageTracker
 
 
 @pytest.mark.unit

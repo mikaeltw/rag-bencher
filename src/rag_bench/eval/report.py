@@ -56,13 +56,13 @@ def write_simple_report(
     extras_html = _render_extras(extras or {})
     html = (
         f"<!doctype html><html><head><meta charset='utf-8'>"
-        f"<title>rag-bench report</title>"
+        f"<title>rag-bencher report</title>"
         f"<style>"
         f"body{{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;"
         f"max-width:900px;margin:2rem auto;padding:0 1rem}}"
         f"code,pre{{background:#f6f8fa;padding:.2rem .3rem;border-radius:6px}}"
         f".section{{margin-bottom:1.5rem}}</style></head>"
-        f"<body><h1>rag-bench report</h1>"
+        f"<body><h1>rag-bencher report</h1>"
         f"<p><strong>Timestamp:</strong> {ts}</p>"
         f"<div class='section'><h2>Question</h2><p>{question}</p></div>"
         f"<div class='section'><h2>Answer</h2><p>{answer}</p></div>"

@@ -8,7 +8,7 @@ from typing import Any, cast
 
 import pytest
 
-from rag_bench.utils import factories, repro
+from rag_bencher.utils import factories, repro
 
 pytestmark = [pytest.mark.unit, pytest.mark.offline]
 

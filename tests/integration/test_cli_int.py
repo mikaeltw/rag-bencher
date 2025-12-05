@@ -4,8 +4,8 @@ from typing import Any, cast
 
 import pytest
 
-from rag_bench import cli
-from rag_bench.config import BenchConfig, DataCfg, ModelCfg, RetrieverCfg
+from rag_bencher import cli
+from rag_bencher.config import BenchConfig, DataCfg, ModelCfg, RetrieverCfg
 
 
 class _DummyChain:
@@ -42,7 +42,7 @@ def test_cli_entrypoint_emits_answer(
     )
     monkeypatch.setattr(cli, "cache_get", lambda *_args, **_kwargs: None)
     monkeypatch.setattr(cli, "cache_set", lambda *_args, **_kwargs: None)
-    monkeypatch.setattr(sys, "argv", ["rag-bench-cli", "--config", str(cfg_path), "--question", "Hello?"])
+    monkeypatch.setattr(sys, "argv", ["rag-bencher-cli", "--config", str(cfg_path), "--question", "Hello?"])
 
     cli.main()
 

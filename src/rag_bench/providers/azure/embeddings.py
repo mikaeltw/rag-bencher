@@ -14,7 +14,7 @@ class AzureOpenAIEmbeddingsAdapter:
 
     def to_langchain(self) -> "AzureOpenAIEmbeddings":
         if not is_installed():
-            raise RuntimeError("Install: rag-bench[azure]")
+            raise RuntimeError("Install: rag-bencher[azure]")
         from langchain_openai import AzureOpenAIEmbeddings
 
         dep = str(self.cfg.get("deployment", "text-embedding-3-large"))

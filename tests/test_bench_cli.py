@@ -8,7 +8,7 @@ from typing import Any, Dict, List
 
 import pytest
 
-from rag_bench import bench_cli
+from rag_bencher import bench_cli
 
 pytestmark = [pytest.mark.unit, pytest.mark.offline]
 

@@ -6,7 +6,7 @@ FROM ${CUDA_IMAGE_DEVEL} AS base-build
 ENV DEBIAN_FRONTEND=noninteractive \
     UV_CACHE_DIR=/opt/uv-cache \
     UV_LINK_MODE=copy \
-    UV_PROJECT_ENVIRONMENT=/opt/rag-bench/.venv \
+    UV_PROJECT_ENVIRONMENT=/opt/rag-bencher/.venv \
     PATH="/root/.local/bin:${PATH}"
 
 RUN apt-get update && \
@@ -40,7 +40,7 @@ FROM ${CUDA_IMAGE_RUNTIME} AS runtime
 
 ENV UV_CACHE_DIR=/opt/uv-cache \
     UV_LINK_MODE=copy \
-    UV_PROJECT_ENVIRONMENT=/opt/rag-bench/.venv \
+    UV_PROJECT_ENVIRONMENT=/opt/rag-bencher/.venv \
     PATH="/root/.local/bin:${PATH}"
 
 # Minimal runtime packages to run the tests/venv (single layer, aggressive cleanup)
@@ -55,6 +55,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man /usr/share/info /tmp/* /var/tmp/*
 
 COPY --from=deps /root/.local /root/.local
-COPY --from=deps /opt/rag-bench/.venv /opt/rag-bench/.venv
+COPY --from=deps /opt/rag-bencher/.venv /opt/rag-bencher/.venv
 
 ENTRYPOINT ["/bin/bash"]

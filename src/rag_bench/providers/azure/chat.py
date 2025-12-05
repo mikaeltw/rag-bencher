@@ -14,7 +14,7 @@ class AzureOpenAIChatAdapter:
 
     def to_langchain(self) -> "AzureChatOpenAI":
         if not is_installed():
-            raise RuntimeError("Install: rag-bench[azure]")
+            raise RuntimeError("Install: rag-bencher[azure]")
         from langchain_openai import AzureChatOpenAI
 
         dep = str(self.cfg.get("deployment", "gpt-4o-mini"))

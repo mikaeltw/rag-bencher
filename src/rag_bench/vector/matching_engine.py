@@ -24,7 +24,7 @@ def _require() -> Type[_VectorSearchVectorStoreProto]:
 
         return cast(Type[_VectorSearchVectorStoreProto], VectorSearchVectorStore)
     except Exception as e:
-        raise RuntimeError("Matching Engine requires langchain-google-vertexai (install rag-bench[gcp])") from e
+        raise RuntimeError("Matching Engine requires langchain-google-vertexai (install rag-bencher[gcp])") from e
 
 
 class MatchingEngineBackend:

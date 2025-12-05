@@ -1,6 +1,6 @@
 # Configuration guide
 
-All runtime behavior is described through YAML files in `configs/`. Configs are validated by `rag_bench.config.BenchConfig` to keep experiments reproducible.
+All runtime behavior is described through YAML files in `configs/`. Configs are validated by `rag_bencher.config.BenchConfig` to keep experiments reproducible.
 
 ## Core fields
 ```yaml
@@ -40,7 +40,7 @@ Use `vector` to swap out the FAISS retriever:
 vector:
   name: azure_ai_search
   endpoint: https://<your>.search.windows.net
-  index: rag-bench
+  index: rag-bencher
   api_key: ${AZURE_SEARCH_API_KEY}
 ```
 Adapters exist for Azure AI Search, OpenSearch, and Matching Engine; extra dependencies are pulled in via the matching extras.

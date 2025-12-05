@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from rag_bench.pipelines import base
+from rag_bencher.pipelines import base
 
 pytestmark = pytest.mark.gpu
 

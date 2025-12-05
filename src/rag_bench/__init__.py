@@ -9,7 +9,7 @@ except Exception:
     _EFFECTIVE_DEVICE = "auto"
 
 try:
-    __version__ = version("rag-bench")
+    __version__ = version("rag-bencher")
 except PackageNotFoundError:
     __version__ = "0.0.0"
 

@@ -6,11 +6,11 @@ from typing import Any, Dict
 
 from rich.console import Console
 
-from rag_bench.config import load_config
-from rag_bench.eval.dataset_loader import load_texts_as_documents
-from rag_bench.eval.metrics import bow_cosine, context_recall, lexical_f1
-from rag_bench.eval.report import write_simple_report
-from rag_bench.pipelines.selector import PipelineSelection, select_pipeline
+from rag_bencher.config import load_config
+from rag_bencher.eval.dataset_loader import load_texts_as_documents
+from rag_bencher.eval.metrics import bow_cosine, context_recall, lexical_f1
+from rag_bencher.eval.report import write_simple_report
+from rag_bencher.pipelines.selector import PipelineSelection, select_pipeline
 
 console = Console()
 

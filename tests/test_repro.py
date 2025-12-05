@@ -4,7 +4,7 @@ import random
 
 import pytest
 
-from rag_bench.utils import repro
+from rag_bencher.utils import repro
 
 
 @pytest.mark.unit

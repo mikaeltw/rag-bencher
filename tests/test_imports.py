@@ -4,6 +4,6 @@ pytestmark = [pytest.mark.unit, pytest.mark.offline]
 
 
 def test_imports() -> None:
-    import rag_bench
+    import rag_bencher
 
-    assert hasattr(rag_bench, "__all__")
+    assert hasattr(rag_bencher, "__all__")

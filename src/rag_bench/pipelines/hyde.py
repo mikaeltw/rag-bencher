@@ -8,10 +8,10 @@ from langchain_core.runnables import RunnableLambda, RunnablePassthrough, Runnab
 from langchain_openai import ChatOpenAI
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from rag_bench.pipelines.base import BuildResult
-from rag_bench.pipelines.utils import has_openai_key, resolve_chat_llm
-from rag_bench.utils.factories import make_hf_embeddings
-from rag_bench.vector.local import build_local_vectorstore
+from rag_bencher.pipelines.base import BuildResult
+from rag_bencher.pipelines.utils import has_openai_key, resolve_chat_llm
+from rag_bencher.utils.factories import make_hf_embeddings
+from rag_bencher.vector.local import build_local_vectorstore
 
 HYP_PROMPT = """You will draft a hypothetical answer to help retrieve relevant passages.
 Question: {question}

@@ -5,9 +5,9 @@ from typing import Any, Dict, List, cast
 import pytest
 from langchain_core.documents import Document
 
-from rag_bench.config import load_config
-from rag_bench.pipelines import hyde, multi_query, naive_rag, rerank
-from rag_bench.pipelines.selector import PipelineSelection, select_pipeline
+from rag_bencher.config import load_config
+from rag_bencher.pipelines import hyde, multi_query, naive_rag, rerank
+from rag_bencher.pipelines.selector import PipelineSelection, select_pipeline
 
 
 class DummyChain:
@@ -38,7 +38,7 @@ def test_select_pipeline_defaults_to_naive(monkeypatch: pytest.MonkeyPatch) -> N
     store: Dict[str, Any] = {}
     chain = make_stub_builder("naive", store)
     monkeypatch.setattr(naive_rag, "build_chain", store["builder"])
-    monkeypatch.setattr("rag_bench.pipelines.selector.load_config", lambda *_: pytest.fail("load_config reused"))
+    monkeypatch.setattr("rag_bencher.pipelines.selector.load_config", lambda *_: pytest.fail("load_config reused"))
 
     selection = select_pipeline("configs/wiki.yaml", docs=[Document(page_content="a")], cfg=bench_cfg)
 
@@ -141,8 +141,8 @@ def test_select_pipeline_builds_provider_adapters(monkeypatch: pytest.MonkeyPatc
         emb_calls["cfg"] = cfg
         return DummyAdapter("emb", emb_calls)
 
-    monkeypatch.setattr("rag_bench.pipelines.selector.build_chat_adapter", fake_chat)
-    monkeypatch.setattr("rag_bench.pipelines.selector.build_embeddings_adapter", fake_emb)
+    monkeypatch.setattr("rag_bencher.pipelines.selector.build_chat_adapter", fake_chat)
+    monkeypatch.setattr("rag_bencher.pipelines.selector.build_embeddings_adapter", fake_emb)
 
     selection = select_pipeline("configs/providers/aws.yaml", docs=[])
 
