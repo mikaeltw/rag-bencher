@@ -45,7 +45,6 @@ jobs:
         id: version
         shell: bash -l {0}
         run: |
-          ls -la dist/
           python - <<'PY'
           import pathlib, re, os
 
@@ -71,10 +70,11 @@ jobs:
         env:
           PKG_VERSION: ${{ steps.version.outputs.PKG_VERSION }}
         run: |
-          echo $PKG_VERSION
+          echo "PKG_VERSION: $PKG_VERSION"
           ls -la dist/
           micromamba activate conda-build-env
           conda build recipe \
+            --set-env PKG_VERSION="${PKG_VERSION}" \
             -c conda-forge \
             --override-channels \
             --no-anaconda-upload
