@@ -49,12 +49,12 @@ jobs:
           import pathlib, re, os
 
           dist = pathlib.Path("dist")
-          candidates = sorted(dist.glob("rag-bencher-*.tar.gz"))
+          candidates = sorted(dist.glob("rag_bencher-*.tar.gz"))
           if not candidates:
-              raise SystemExit("No rag-bencher sdist found in dist/")
+              raise SystemExit("No rag_bencher sdist found in dist/")
 
           sdist = candidates[-1]
-          m = re.match(r"rag-bencher-(.+)\.tar\.gz", sdist.name)
+          m = re.match(r"rag_bencher-(.+)\.tar\.gz", sdist.name)
           if not m:
               raise SystemExit(f"Unexpected sdist name: {sdist.name}")
 

@@ -149,8 +149,8 @@ include = ["rag_bencher*"]
 
 [tool.setuptools_scm]
 fallback_version = "0.0.0"
-# version_scheme = "post-release"
-# local_scheme = "node-and-date"
+version_scheme = "guess-next-dev"
+local_scheme = "node-and-date"  # keep unique, PEP440-compliant local hashes for branch builds
 
 [tool.tox]
 requires = ["tox>=4.15", "tox-uv>=1.10"]  # uv-backed env creation & installs

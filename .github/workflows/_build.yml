@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # needed for setuptools-scm to see tags and generate dev versions
 
       - name: Set up Python
         uses: actions/setup-python@v5
