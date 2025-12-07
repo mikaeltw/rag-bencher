@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/rag-bencher-logo.png" alt="rag-bench logo" width="820"/>
+  <img src="https://github.com/mikaeltw/rag-bencher/raw/main/assets/rag-bencher-logo.png" alt="rag-bench logo" width="820"/>
 </p>
 
 <p align="center">

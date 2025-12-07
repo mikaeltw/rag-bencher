@@ -148,6 +148,7 @@ where = ["src"]
 include = ["rag_bencher*"]
 
 [tool.setuptools_scm]
+fallback_version = "0.0.0.tdev"
 local_scheme = "no-local-version"  # PEP440-compliant requires no +githash
 
 [tool.tox]

@@ -32,53 +32,53 @@ jobs:
           name: dist
           path: dist
 
-    #   - name: Set up micromamba
-    #     uses: mamba-org/setup-micromamba@v2
-    #     with:
-    #       environment-name: conda-build-env
-    #       create-args: >-
-    #         python=3.12
-    #         conda-build
-    #         -c conda-forge
+      - name: Set up micromamba
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-name: conda-build-env
+          create-args: >-
+            python=3.12
+            conda-build
+            -c conda-forge
 
-    #   - name: Determine PKG_VERSION from sdist
-    #     id: version
-    #     shell: bash -l {0}
-    #     run: |
-    #       python - <<'PY'
-    #       import pathlib, re, os
+      - name: Determine PKG_VERSION from sdist
+        id: version
+        shell: bash -l {0}
+        run: |
+          python - <<'PY'
+          import pathlib, re, os
 
-    #       dist = pathlib.Path("dist")
-    #       candidates = sorted(dist.glob("rag_bencher-*.tar.gz"))
-    #       if not candidates:
-    #           raise SystemExit("No rag_bencher sdist found in dist/")
+          dist = pathlib.Path("dist")
+          candidates = sorted(dist.glob("rag_bencher-*.tar.gz"))
+          if not candidates:
+              raise SystemExit("No rag_bencher sdist found in dist/")
 
-    #       sdist = candidates[-1]
-    #       m = re.match(r"rag_bencher-(.+)\.tar\.gz", sdist.name)
-    #       if not m:
-    #           raise SystemExit(f"Unexpected sdist name: {sdist.name}")
+          sdist = candidates[-1]
+          m = re.match(r"rag_bencher-(.+)\.tar\.gz", sdist.name)
+          if not m:
+              raise SystemExit(f"Unexpected sdist name: {sdist.name}")
 
-    #       version = m.group(1)
-    #       print("Using PKG_VERSION:", version)
+          version = m.group(1)
+          print("Using PKG_VERSION:", version)
 
-    #       with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-    #           f.write(f"PKG_VERSION={version}\n")
-    #       PY
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"PKG_VERSION={version}\n")
+          PY
 
-    #   - name: Build and test conda package
-    #     shell: bash -l {0}
-    #     env:
-    #       PKG_VERSION: ${{ steps.version.outputs.PKG_VERSION }}
-    #     run: |
-    #       echo "PKG_VERSION: $PKG_VERSION"
-    #       echo "PKG_VERSION: \"${PKG_VERSION}\"" > recipe/_pkg_version_config.yaml
-    #       ls -la dist/
-    #       micromamba activate conda-build-env
-    #       conda build recipe \
-    #         -m recipe/_pkg_version_config.yaml \
-    #         -c conda-forge \
-    #         --override-channels \
-    #         --no-anaconda-upload
+      - name: Build and test conda package
+        shell: bash -l {0}
+        env:
+          PKG_VERSION: ${{ steps.version.outputs.PKG_VERSION }}
+        run: |
+          echo "PKG_VERSION: $PKG_VERSION"
+          echo "PKG_VERSION: \"${PKG_VERSION}\"" > recipe/_pkg_version_config.yaml
+          ls -la dist/
+          micromamba activate conda-build-env
+          conda build recipe \
+            -m recipe/_pkg_version_config.yaml \
+            -c conda-forge \
+            --override-channels \
+            --no-anaconda-upload
 
   publish-testpypi:
     name: Publish to TestPyPI & smoke-test (pip)
