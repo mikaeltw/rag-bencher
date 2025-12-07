@@ -13,11 +13,11 @@ source:
 build:
   noarch: python
   script: {{ PYTHON }} -m pip install . -vv
-
-# Tell conda-build to read PEP 517 build-system requirements from the sdist's
-# pyproject.toml and install them from conda (not PyPI).
-pyproject:
-  file: pyproject.toml
+  # Ask conda-build to honor the sdist's pyproject.toml and install build-system
+  # requirements from conda (PEP 517 isolation).
+  pyproject:
+    file: pyproject.toml
+    backend: setuptools.build_meta
 
 requirements:
   host:
