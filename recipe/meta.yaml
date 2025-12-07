@@ -16,6 +16,10 @@ build:
   # Ask conda-build to honor the sdist's pyproject.toml and install build-system
   # requirements from conda (PEP 517 isolation).
   pyproject:
+    requires:
+      - setuptools >=68
+      - wheel
+      - setuptools-scm >=8
     file: pyproject.toml
     backend: setuptools.build_meta
 
