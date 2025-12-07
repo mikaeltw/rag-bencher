@@ -34,16 +34,19 @@ jobs:
         id: version
         run: |
 
-          BASE_VERSION=$(git describe --tags --exact-match)
+          BASE_VERSION=$(git describe --tags --abbrev=0)
+          TAG=$(git describe --tags --exact-match 2>/dev/null || true)
 
           # Are we exactly on a release tag?
-          if [ -n "$BASE_VERSION" ] && [[ "$BASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [ -n "$TAG" ] && [[ "$TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             # Tagged commit: release build, no pretend version
+            echo "This is a release build for version $TAG"
             echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
             echo "pretend_version=" >> $GITHUB_OUTPUT
           else
             # Non-tag commit: dev build with unique version
             PRETEND_VERSION="${BASE_VERSION}.dev${GITHUB_RUN_NUMBER}"
+            echo "This is a dev build"
             echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
             echo "pretend_version=$PRETEND_VERSION" >> $GITHUB_OUTPUT
           fi
