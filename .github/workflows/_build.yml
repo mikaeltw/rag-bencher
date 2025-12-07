@@ -33,11 +33,11 @@ jobs:
       - name: Determine version from git
         id: version
         run: |
-          # Latest tag reachable from HEAD, e.g. "0.3.0"
-          BASE_VERSION=$(git describe --tags --abbrev=0)
 
-          # Are we exactly on a tag?
-          if git describe --tags --exact-match >/dev/null 2>&1; then
+          BASE_VERSION=$(git describe --tags --exact-match)
+
+          # Are we exactly on a release tag?
+          if [ -n "$BASE_VERSION" ] && [[ "$BASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             # Tagged commit: release build, no pretend version
             echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
             echo "pretend_version=" >> $GITHUB_OUTPUT
