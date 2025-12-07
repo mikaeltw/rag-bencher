@@ -33,6 +33,16 @@ requirements:
     - setuptools-scm >=8
   run:
     - python >=3.12,<3.15
+    - langchain >=0.2.0
+    - langchain-community >=0.2.0
+    - langchain-openai >=0.1.0
+    - langchain-huggingface >=0.1.0
+    - sentence-transformers >=2.2.2
+    - faiss-cpu >=1.7.4
+    - pydantic >=2.7.0
+    - pyyaml >=6.0.1
+    - rich >=13.7.0
+    - numpy >=1.26.0
 
 test:
   imports:
