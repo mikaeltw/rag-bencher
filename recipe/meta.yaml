@@ -6,7 +6,7 @@
 
 package:
   name: {{ name|lower }}
-  version: {{ conda_version }}
+  version: {{ pypi_version }}
 
 source:
   path: ../dist/rag_bencher-{{ pypi_version }}.tar.gz
@@ -19,10 +19,8 @@ requirements:
   host:
     - python >=3.12,<3.15
     - pip
-    - numpy {{ numpy }}
   run:
     - python >=3.12,<3.15
-    - numpy >=1.26
 
 test:
   imports:

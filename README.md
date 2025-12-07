@@ -1,8 +1,6 @@
 <p align="center">
-  <img src="assets/rag-bencher-logo.png" alt="rag-bench logo" width="220"/>
+  <img src="assets/rag-bencher-logo.png" alt="rag-bench logo" width="820"/>
 </p>
-
-<h1 align="center">rag-bencher</h1>
 
 <p align="center">
   <b>Reproducible, extensible, multi-provider benchmarking for Retrieval-Augmented Generation (RAG) systems.</b>
