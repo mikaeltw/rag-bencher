@@ -2,14 +2,13 @@
 # PKG_VERSION is the full PEP 440 version (may include +local). Conda
 # versions cannot include the local segment, so strip everything after "+".
 {% set pypi_version = environ.get("PKG_VERSION") or PKG_VERSION or "0.0.0.dev0" %}
-{% set conda_version = pypi_version.split("+")[0] %}
 
 package:
   name: {{ name|lower }}
   version: {{ pypi_version }}
 
 source:
-  path: ../dist/rag_bencher-{{ pypi_version }}.tar.gz
+  url: ../dist/rag_bencher-{{ pypi_version }}.tar.gz
 
 build:
   noarch: python
