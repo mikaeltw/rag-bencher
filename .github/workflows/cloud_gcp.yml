@@ -3,6 +3,9 @@ name: Cloud GCP Workflow
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   cloud-gcp:
     runs-on: ubuntu-latest

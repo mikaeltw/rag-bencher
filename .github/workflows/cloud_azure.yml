@@ -3,6 +3,9 @@ name: Cloud Azure Workflow
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   cloud-azure:
     runs-on: ubuntu-latest

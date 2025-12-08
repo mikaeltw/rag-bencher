@@ -3,6 +3,9 @@ name: Cloud AWS Workflow
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   cloud-aws:
     runs-on: ubuntu-latest

@@ -9,6 +9,9 @@ on:
         default: "3.12"
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   _build-package:
     name: _Build Package
