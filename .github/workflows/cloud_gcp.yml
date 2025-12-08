@@ -1,21 +1,26 @@
-# name: Cloud GCP
-# on:
-#   workflow_dispatch:
+name: Cloud GCP Workflow
 
-# jobs:
-#   cloud-gcp:
-#     runs-on: ubuntu-latest
-#     continue-on-error: true
-#     if: github.event_name != 'pull_request' && (secrets.GCP_PROJECT != '' || vars.GCP_PROJECT != '')
-#     timeout-minutes: 10
-#     steps:
-#       - uses: actions/checkout@v4
-#       - uses: actions/setup-python@v5
-#         with: { python-version: '3.12' }
-#       - name: Install
-#         run: |
-#           python -m pip install -U pip
-#           pip install -e ".[gcp]"
+on:
+  workflow_dispatch:
+
+jobs:
+  cloud-gcp:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+#      if: github.event_name != 'pull_request' && (secrets.GCP_PROJECT != '' || vars.GCP_PROJECT != '')
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+
+      - name: Install
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[gcp]"
+
 #       - name: ADC auth
 #         if: env.GOOGLE_CREDENTIALS_JSON != ''
 #         run: |
