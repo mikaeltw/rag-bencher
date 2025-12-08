@@ -80,8 +80,8 @@ jobs:
             --override-channels \
             --no-anaconda-upload
 
-  publish-testpypi:
-    name: Publish to TestPyPI & smoke-test (pip)
+  publish-to-testpypi-and-smoke-test:
+    name: Publish to TestPyPI And Smoke Test
     needs: conda-build-test
     runs-on: ubuntu-latest
     environment:
