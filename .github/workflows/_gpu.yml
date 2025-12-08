@@ -1,4 +1,5 @@
-name: gpu
+name: _GPU Suite Workflow
+
 on:
   workflow_call:
     inputs:
@@ -15,14 +16,15 @@ on:
         required: false
         type: string
 
-
 jobs:
-  gpu-tests:
+  _gpu-suite:
+    name: _GPU Suite
     runs-on: [self-hosted, cirun, linux, x64, gpu, gcp]
     env:
       CIRUN_TOKEN: ${{ secrets.CIRUN_RAG_BENCH_API_KEY }}
     strategy:
       fail-fast: false
+
     steps:
       - uses: actions/checkout@v4
 

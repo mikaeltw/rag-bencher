@@ -1,4 +1,4 @@
-name: Build package
+name: _Build Package Workflow
 
 on:
   workflow_call:
@@ -10,8 +10,8 @@ on:
         type: string
 
 jobs:
-  build-dist:
-    name: Build sdist & wheel
+  _build-package:
+    name: _Build Package
     runs-on: ubuntu-latest
 
     steps:

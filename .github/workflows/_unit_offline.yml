@@ -1,4 +1,5 @@
-name: _unit_offline
+name: _Unit & Offline Workflow
+
 on:
   workflow_call:
     inputs:
@@ -12,10 +13,12 @@ on:
         type: string
 
 jobs:
-  tests:
+  _unit-and-offline:
+    name: _Unit And Offline
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+
     steps:
       - uses: actions/checkout@v4
 

@@ -1,4 +1,4 @@
-name: Release (PyPI)
+name: Release (PyPI) Workflow
 
 on:
   release:
@@ -9,15 +9,15 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    name: Build package (wheel/sdist)
+  build-release-package:
+    name: Build Release Package
     uses: ./.github/workflows/_build.yml
     with:
       python-version: "3.12"
 
-  publish-pypi:
+  publish-to-pypi:
     name: Publish to PyPI
-    needs: build
+    needs: build-release-package
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
