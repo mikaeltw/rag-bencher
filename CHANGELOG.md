@@ -2,9 +2,8 @@
 # Changelog
 
 ## [Unreleased]
-- TODO: add changes after the next release cut.
 
-## [0.1.0] - Unreleased
+## [0.0.1]
 ### Added
 - First public release with RAG baselines (naive, multi-query, HyDE, rerank).
 - Strict config validation, dataset registry, eval harness, and multi-run reports.
