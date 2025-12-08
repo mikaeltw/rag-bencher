@@ -1,13 +1,20 @@
-name: Lint & Typecheck
+name: Lint & Typecheck Workflow
+
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  lint-typecheck:
+  lint-and-typecheck:
+    name: Lint And Typecheck
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 

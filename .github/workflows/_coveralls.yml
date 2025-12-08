@@ -1,4 +1,5 @@
-name: coverage
+name: _Coverage Collection Workflow
+
 on:
   workflow_call:
     inputs:
@@ -7,11 +8,16 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+
 jobs:
-  coverage-aggregate:
+  _coverage-collection:
+    name: _Coverage Collection
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+
     steps:
       - uses: actions/checkout@v4
 

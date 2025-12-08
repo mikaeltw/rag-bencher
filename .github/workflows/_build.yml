@@ -1,4 +1,4 @@
-name: Build package
+name: _Build Package Workflow
 
 on:
   workflow_call:
@@ -9,9 +9,12 @@ on:
         default: "3.12"
         type: string
 
+permissions:
+  contents: read
+
 jobs:
-  build-dist:
-    name: Build sdist & wheel
+  _build-package:
+    name: _Build Package
     runs-on: ubuntu-latest
 
     steps:

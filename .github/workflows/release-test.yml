@@ -1,4 +1,4 @@
-name: Build & Release test
+name: Build & Release Test Workflow
 
 on:
   push:
@@ -11,15 +11,15 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    name: Build package (wheel/sdist)
+  build-test-package:
+    name: Build Test Package
     uses: ./.github/workflows/_build.yml
     with:
       python-version: "3.12"
 
   conda-build-test:
-    name: Build & test conda recipe from sdist
-    needs: build
+    name: Conda Build Test
+    needs: build-test-package
     runs-on: ubuntu-latest
 
     steps:
@@ -80,8 +80,8 @@ jobs:
             --override-channels \
             --no-anaconda-upload
 
-  publish-testpypi:
-    name: Publish to TestPyPI & smoke-test (pip)
+  publish-to-testpypi-and-smoke-test:
+    name: Publish to TestPyPI And Smoke Test
     needs: conda-build-test
     runs-on: ubuntu-latest
     environment:
