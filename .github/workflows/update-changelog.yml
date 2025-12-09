@@ -27,6 +27,8 @@ jobs:
       - name: Resolve release details
         id: release
         uses: actions/github-script@v7
+        env:
+          WORKFLOW_TAG_INPUT: ${{ github.event.inputs.release_tag }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -51,8 +53,6 @@ jobs:
             core.setOutput('tag', release.tag_name);
             core.setOutput('body', release.body || '');
             core.setOutput('published_at', release.published_at || release.created_at || new Date().toISOString());
-          env:
-            WORKFLOW_TAG_INPUT: ${{ github.event.inputs.release_tag }}
 
       - name: Insert release notes into CHANGELOG.md
         env:
