@@ -34,6 +34,7 @@ jobs:
   coverage-collection:
     name: Coverage Collection
     needs: [unit-and-offline, gpu-suite]
+    if: needs.gpu-suite.result == 'success'
     uses: ./.github/workflows/_coveralls.yml
     with:
       expect: "unit-offline,gpu"
