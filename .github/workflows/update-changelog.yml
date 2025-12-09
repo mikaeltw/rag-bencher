@@ -1,0 +1,101 @@
+name: Update Changelog
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to sync (blank = latest release)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  changelog:
+    name: Update CHANGELOG.md
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve release details
+        id: release
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const tagInput = process.env.WORKFLOW_TAG_INPUT || '';
+            const {owner, repo} = context.repo;
+
+            let release = null;
+
+            if (context.eventName === 'release' && context.payload.release) {
+              release = context.payload.release;
+            } else if (tagInput) {
+              release = (await github.rest.repos.getReleaseByTag({owner, repo, tag: tagInput})).data;
+            } else {
+              release = (await github.rest.repos.getLatestRelease({owner, repo})).data;
+            }
+
+            if (!release) {
+              throw new Error('No release information available.');
+            }
+
+            core.setOutput('name', release.name || release.tag_name || 'Unspecified');
+            core.setOutput('tag', release.tag_name);
+            core.setOutput('body', release.body || '');
+            core.setOutput('published_at', release.published_at || release.created_at || new Date().toISOString());
+          env:
+            WORKFLOW_TAG_INPUT: ${{ github.event.inputs.release_tag }}
+
+      - name: Insert release notes into CHANGELOG.md
+        env:
+          RELEASE_NAME: ${{ steps.release.outputs.name }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          RELEASE_BODY: ${{ steps.release.outputs.body }}
+          RELEASE_DATE: ${{ steps.release.outputs.published_at }}
+          CHANGELOG_PATH: CHANGELOG.md
+        run: |
+          node - <<'EOF'
+          const fs = require('fs');
+          const path = process.env.CHANGELOG_PATH;
+
+          const body = (process.env.RELEASE_BODY || '').trim();
+          if (!body) {
+            console.log('Release body is empty; skipping changelog update.');
+            process.exit(0);
+          }
+
+          const displayName = process.env.RELEASE_NAME || process.env.RELEASE_TAG || 'Unspecified';
+          const date = new Date(process.env.RELEASE_DATE || Date.now()).toISOString().split('T')[0];
+          const section = `## [${displayName}] - ${date}\n${body}\n\n`;
+
+          const changelog = fs.readFileSync(path, 'utf8');
+          const unreleasedHeader = '## [Unreleased]';
+          const start = changelog.indexOf(unreleasedHeader);
+          if (start === -1) {
+            console.error('Unable to find Unreleased section in CHANGELOG.md');
+            process.exit(1);
+          }
+
+          const nextSectionIdx = changelog.indexOf('\n## [', start + unreleasedHeader.length);
+          const insertPos = nextSectionIdx === -1 ? changelog.length : nextSectionIdx;
+          const updated = changelog.slice(0, insertPos) + '\n\n' + section + changelog.slice(insertPos);
+          fs.writeFileSync(path, updated);
+          EOF
+
+      - name: Create changelog PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/changelog-release-${{ steps.release.outputs.tag }}
+          title: "chore: update changelog for ${{ steps.release.outputs.tag }}"
+          body: "Update CHANGELOG.md with notes from ${{ steps.release.outputs.tag }}."
+          commit-message: "chore: update changelog for ${{ steps.release.outputs.tag }}"
+          add-paths: |
+            CHANGELOG.md
