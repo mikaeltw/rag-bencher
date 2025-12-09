@@ -20,6 +20,11 @@ jobs:
 
   gpu-suite:
     name: GPU Suite
+    if: >
+      (github.event_name == 'push' && github.actor == 'mikaeltw') ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.user.login == 'mikaeltw') ||
+      (github.event_name == 'workflow_dispatch' && github.actor == 'mikaeltw')
     uses: ./.github/workflows/_gpu.yml
     secrets: inherit
     with:
@@ -29,6 +34,7 @@ jobs:
   coverage-collection:
     name: Coverage Collection
     needs: [unit-and-offline, gpu-suite]
+    if: needs.gpu-suite.result == 'success'
     uses: ./.github/workflows/_coveralls.yml
     with:
       expect: "unit-offline,gpu"
