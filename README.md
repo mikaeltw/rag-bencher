@@ -12,9 +12,9 @@
 [![Build & Test release](https://github.com/mikaeltw/rag-bencher/actions/workflows/release-test.yml/badge.svg?branch=main)](https://github.com/mikaeltw/rag-bencher/actions/workflows/release-test.yml)
 [![Coverage Status](https://img.shields.io/coveralls/github/mikaeltw/rag-bencher?branch=main&logo=coveralls)](https://coveralls.io/github/mikaeltw/rag-bencher?branch=main)
 [![PyPI](https://img.shields.io/pypi/v/rag-bencher.svg?logo=pypi&flat)](https://pypi.org/project/rag-bencher/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Repo size](https://img.shields.io/github/repo-size/mikaeltw/rag-bencher)
-![Code size](https://img.shields.io/github/languages/code-size/mikaeltw/rag-bencher)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?logo=open-source-initiative&logoColor=white)](LICENSE)
+![Repo size](https://img.shields.io/github/repo-size/mikaeltw/rag-bencher?logo=github&logoColor=white)
+![Code size](https://img.shields.io/github/languages/code-size/mikaeltw/rag-bencher?logo=codefactor&logoColor=white)
 
 ---
 
