@@ -1,4 +1,4 @@
-name: _Unit & Offline Workflow
+name: _Unit & Offline
 
 on:
   workflow_call:
