@@ -1,4 +1,4 @@
-name: Cloud Azure Workflow
+name: Cloud Azure
 
 on:
   workflow_dispatch:

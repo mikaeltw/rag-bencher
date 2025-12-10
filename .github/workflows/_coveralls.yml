@@ -1,4 +1,4 @@
-name: _Coverage Collection Workflow
+name: _Coverage Collection
 
 on:
   workflow_call:

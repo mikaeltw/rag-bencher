@@ -1,4 +1,4 @@
-name: _GPU Suite Workflow
+name: _GPU Suite
 
 on:
   workflow_call:

@@ -1,4 +1,4 @@
-name: Release (PyPI) Workflow
+name: Release (PyPI)
 
 on:
   release:
