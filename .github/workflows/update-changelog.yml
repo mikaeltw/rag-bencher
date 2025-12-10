@@ -64,35 +64,102 @@ jobs:
         run: |
           node - <<'EOF'
           const fs = require('fs');
-          const path = process.env.CHANGELOG_PATH;
+          const { execSync } = require('child_process');
 
-          const body = (process.env.RELEASE_BODY || '').trim();
-          if (!body) {
-            console.log('Release body is empty; skipping changelog update.');
-            process.exit(0);
+          const path = process.env.CHANGELOG_PATH;
+          const rawBody = (process.env.RELEASE_BODY || '').trim();
+
+          if (!rawBody) {
+          console.log('Release body is empty; skipping changelog update.');
+          process.exit(0);
           }
 
-          const displayName = process.env.RELEASE_NAME || process.env.RELEASE_TAG || 'Unspecified';
-          const date = new Date(process.env.RELEASE_DATE || Date.now()).toISOString().split('T')[0];
-          const section = `## [${displayName}] - ${date}\n${body}\n\n`;
+          const versionId = (process.env.RELEASE_TAG || '').trim();
+          if (!versionId) {
+          console.error('Release tag is missing; cannot update changelog.');
+          process.exit(1);
+          }
+
+          const date = new Date(process.env.RELEASE_DATE || Date.now())
+          .toISOString()
+          .split('T')[0];
+
+          // Shift headings down for CHANGELOG nesting
+          let body = rawBody
+          .replace(/^### /gm, '#### ')
+          .replace(/^## /gm, '### ');
+
+          // Try to determine previous tag for compare URL
+          let previousTag = null;
+          try {
+          const tagList = execSync('git tag --sort=version:refname', { encoding: 'utf8' })
+              .split('\n')
+              .map(t => t.trim())
+              .filter(Boolean);
+
+          const idx = tagList.indexOf(versionId);
+          if (idx > 0) {
+              previousTag = tagList[idx - 1];
+              console.log(`Previous tag detected: ${previousTag}`);
+          } else {
+              console.log('No previous tag found (this may be the first release).');
+          }
+          } catch (err) {
+          console.log('Could not determine previous tag:', err.message);
+          }
+
+          // Build optional Full Changelog link
+          const repoSlug = process.env.GITHUB_REPOSITORY || '';
+          let compareLine = '';
+          if (previousTag && repoSlug) {
+          const url = `https://github.com/${repoSlug}/compare/${previousTag}...${versionId}`;
+          compareLine = `\n\n**Full Changelog**: ${url}`;
+          }
+
+          const newSection = `## [${versionId}] - ${date}\n${body}${compareLine}\n\n`;
 
           const changelog = fs.readFileSync(path, 'utf8');
+
           const unreleasedHeader = '## [Unreleased]';
-          const start = changelog.indexOf(unreleasedHeader);
-          if (start === -1) {
-            console.error('Unable to find Unreleased section in CHANGELOG.md');
-            process.exit(1);
+          const unreleasedIndex = changelog.indexOf(unreleasedHeader);
+          if (unreleasedIndex === -1) {
+          console.error('Unable to find Unreleased section in CHANGELOG.md');
+          process.exit(1);
           }
 
-          const nextSectionIdx = changelog.indexOf('\n## [', start + unreleasedHeader.length);
+          const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const headerRegex = new RegExp(
+          '^## \\[' + escape(versionId) + '\\](?: - \\d{4}-\\d{2}-\\d{2})?',
+          'm'
+          );
+
+          const existingMatch = changelog.match(headerRegex);
+
+          let updated;
+
+          if (existingMatch) {
+          console.log(`Existing section found for ${versionId}; replacing it.`);
+          const start = existingMatch.index;
+          const nextHeaderIdx = changelog.indexOf('\n## [', start + 1);
+          const end = nextHeaderIdx === -1 ? changelog.length : nextHeaderIdx;
+          updated = changelog.slice(0, start) + newSection + changelog.slice(end);
+          } else {
+          console.log(`No section found for ${versionId}; inserting a new one.`);
+          const nextSectionIdx = changelog.indexOf(
+              '\n## [',
+              unreleasedIndex + unreleasedHeader.length
+          );
           const insertPos = nextSectionIdx === -1 ? changelog.length : nextSectionIdx;
-          const updated = changelog.slice(0, insertPos) + '\n\n' + section + changelog.slice(insertPos);
+          updated = changelog.slice(0, insertPos) + '\n\n' + newSection + changelog.slice(insertPos);
+          }
+
           fs.writeFileSync(path, updated);
           EOF
 
       - name: Create changelog PR
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.CHANGELOG_PAT }}
           branch: chore/changelog-release-${{ steps.release.outputs.tag }}
           title: "chore: update changelog for ${{ steps.release.outputs.tag }}"
           body: "Update CHANGELOG.md with notes from ${{ steps.release.outputs.tag }}."
