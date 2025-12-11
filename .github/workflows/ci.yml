@@ -33,7 +33,10 @@ jobs:
   coverage-collection:
     name: Coverage Collection
     needs: [unit-and-offline, gpu-suite]
-    if: needs.gpu-suite.result == 'success' && (github.event_name != 'pull_request' || !startsWith(github.head_ref, 'chore/changelog-release-'))
+    if: >
+      (needs.unit-and-offline.result == 'success' && needs.gpu-suite.result == 'success') ||
+      (github.event_name == 'pull_request' && startsWith(github.head_ref, 'chore/changelog-release-'))
     uses: ./.github/workflows/_coveralls.yml
     with:
       expect: "unit-offline,gpu"
+    secrets: inherit
