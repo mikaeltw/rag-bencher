@@ -1,1 +1,2 @@
-See GitHub Actions workflows publish-pypi.yml and publish-testpypi.yml.
+# Release
+Please see the "Release process (maintainers)" section of `CONTRIBUTING.md`

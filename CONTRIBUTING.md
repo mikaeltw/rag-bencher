@@ -4,7 +4,7 @@
 Thanks for considering a contribution!
 
 ## Setup
-- Use Python 3.12–3.14 (recommended: `uv`).
+- Use Python 3.12–3.14 (recommended: `uv`, install with `make setup`).
 - `make sync` creates/refreshes a local venv with all extras for development.
 - Alternatively: `python -m venv .venv && source .venv/bin/activate && pip install -e .[dev]`.
 - Before sending a PR run: `make dev` (lint + typecheck + tests).
@@ -13,6 +13,7 @@ Thanks for considering a contribution!
 - `make lint` (flake8 + isort check + black check) and `make typecheck` (mypy).
 - `make test` runs CPU/offline tests via tox; `make test-all` runs the full Python matrix.
 - `make test-all-gpu` covers GPU-tagged tests; only run on a GPU host.
+- `make help` for an extensive list of targets.
 - Keep default runs offline-friendly; mark GPU or network-heavy tests explicitly.
 
 ## Coding style
@@ -32,6 +33,6 @@ Thanks for considering a contribution!
 - Include sample configs or datasets in `examples/` if they improve discoverability.
 
 ## Release process (maintainers)
-- Update `CHANGELOG.md`.
-- Create a Git tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
-- Create a GitHub Release from the tag; the publish workflow uploads to PyPI.
+- Create a Git tag: `git tag X.Y.Z && git push origin X.Y.Z`.
+- Create a GitHub Release from the tag; the publish workflow (`.github/workflows/release.yml`) uploads to PyPI.
+- Creating a release triggers a workflow that creates a PR for updating the `CHANGELOG.md`. Merge said PR asap.
