@@ -83,7 +83,6 @@ jobs:
 
   publish-to-testpypi-and-smoke-test:
     name: Publish to TestPyPI And Smoke Test
-    if: "github.event_name != 'pull_request' || !startsWith(github.head_ref, 'chore/changelog-release-')"
     needs: conda-build-test
     runs-on: ubuntu-latest
     environment:
