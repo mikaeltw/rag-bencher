@@ -23,8 +23,7 @@ jobs:
     if: >
       (github.event_name == 'push' && github.actor == 'mikaeltw') ||
       (github.event_name == 'pull_request' && github.event.pull_request.user.login == 'mikaeltw') ||
-      (github.event_name == 'workflow_dispatch' && github.actor == 'mikaeltw') ||
-      (github.event_name == 'pull_request' && startsWith(github.head_ref, 'chore/changelog-release-'))
+      (github.event_name == 'workflow_dispatch' && github.actor == 'mikaeltw')
     uses: ./.github/workflows/_gpu.yml
     secrets: inherit
     with:
@@ -34,7 +33,7 @@ jobs:
   coverage-collection:
     name: Coverage Collection
     needs: [unit-and-offline, gpu-suite]
-    if: "needs.gpu-suite.result == 'success' || github.event_name == 'pull_request' && startsWith(github.head_ref, 'chore/changelog-release-')"
+    if: needs.gpu-suite.result == 'success' && (github.event_name != 'pull_request' || !startsWith(github.head_ref, 'chore/changelog-release-'))
     uses: ./.github/workflows/_coveralls.yml
     with:
       expect: "unit-offline,gpu"
