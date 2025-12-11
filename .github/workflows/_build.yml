@@ -12,30 +12,40 @@ on:
 permissions:
   contents: read
 
+env:
+  IS_CHANGELOG_PR: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'chore/changelog-release-') }}
+
 jobs:
   _build-package:
     name: _Build Package
-    if: "github.event_name != 'pull_request' || !startsWith(github.head_ref, 'chore/changelog-release-')"
     runs-on: ubuntu-latest
 
     steps:
+      - name: Skip build for changelog PR
+        if: ${{ env.IS_CHANGELOG_PR }}
+        run: echo "Changelog-only PR - skipping package build."
+
       - name: Checkout
+        if: ${{ !env.IS_CHANGELOG_PR }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # For tags
 
       - name: Set up Python
+        if: ${{ !env.IS_CHANGELOG_PR }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
 
       - name: Install build tooling
+        if: ${{ !env.IS_CHANGELOG_PR }}
         run: |
           python -m pip install --upgrade pip
           python -m pip install build twine
 
       - name: Determine version from git
         id: version
+        if: ${{ !env.IS_CHANGELOG_PR }}
         run: |
 
           BASE_VERSION=$(git describe --tags --abbrev=0)
@@ -56,10 +66,11 @@ jobs:
           fi
 
       - name: Set SETUPTOOLS_SCM_PRETEND_VERSION for dev builds
-        if: steps.version.outputs.pretend_version != ''
+        if: ${{ !env.IS_CHANGELOG_PR && steps.version.outputs.pretend_version != '' }}
         run: echo "SETUPTOOLS_SCM_PRETEND_VERSION=${{ steps.version.outputs.pretend_version }}" >> $GITHUB_ENV
 
       - name: Show effective version
+        if: ${{ !env.IS_CHANGELOG_PR }}
         run: |
           if [ -n "${SETUPTOOLS_SCM_PRETEND_VERSION:-}" ]; then
             echo "Building version: $SETUPTOOLS_SCM_PRETEND_VERSION"
@@ -68,13 +79,16 @@ jobs:
           fi
 
       - name: Build distributions
+        if: ${{ !env.IS_CHANGELOG_PR }}
         run: python -m build
 
       - name: Check metadata
+        if: ${{ !env.IS_CHANGELOG_PR }}
         run: |
           python -m twine check dist/*
 
       - name: Upload dist artifacts
+        if: ${{ !env.IS_CHANGELOG_PR }}
         uses: actions/upload-artifact@v4
         with:
           name: dist
