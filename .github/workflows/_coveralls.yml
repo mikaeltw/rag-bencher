@@ -14,6 +14,7 @@ permissions:
 jobs:
   _coverage-collection:
     name: _Coverage Collection
+    if: "github.event_name != 'pull_request' || !startsWith(github.head_ref, 'chore/changelog-release-')"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
