@@ -160,6 +160,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.CHANGELOG_PAT }}
+          base: ${{ github.event.release.target_commitish || 'main' }}
           branch: chore/changelog-release-${{ steps.release.outputs.tag }}
           title: "chore: update changelog for ${{ steps.release.outputs.tag }}"
           body: "Update CHANGELOG.md with notes from ${{ steps.release.outputs.tag }}."
