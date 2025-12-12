@@ -27,22 +27,22 @@ jobs:
 
     steps:
       - name: Skip conda build for changelog PR
-        if: ${{ env.IS_CHANGELOG_PR }}
+        if: ${{ fromJSON(env.IS_CHANGELOG_PR) }}
         run: echo "Changelog-only PR - skipping conda build."
 
       - name: Checkout
-        if: ${{ !env.IS_CHANGELOG_PR }}
+        if: ${{ !fromJSON(env.IS_CHANGELOG_PR) }}
         uses: actions/checkout@v4
 
       - name: Download built distributions
-        if: ${{ !env.IS_CHANGELOG_PR }}
+        if: ${{ !fromJSON(env.IS_CHANGELOG_PR) }}
         uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
 
       - name: Set up micromamba
-        if: ${{ !env.IS_CHANGELOG_PR }}
+        if: ${{ !fromJSON(env.IS_CHANGELOG_PR) }}
         uses: mamba-org/setup-micromamba@v2
         with:
           environment-name: conda-build-env
@@ -53,7 +53,7 @@ jobs:
 
       - name: Determine PKG_VERSION from sdist
         id: version
-        if: ${{ !env.IS_CHANGELOG_PR }}
+        if: ${{ !fromJSON(env.IS_CHANGELOG_PR) }}
         shell: bash -l {0}
         run: |
           python - <<'PY'
@@ -77,7 +77,7 @@ jobs:
           PY
 
       - name: Build and test conda package
-        if: ${{ !env.IS_CHANGELOG_PR }}
+        if: ${{ !fromJSON(env.IS_CHANGELOG_PR) }}
         shell: bash -l {0}
         env:
           PKG_VERSION: ${{ steps.version.outputs.PKG_VERSION }}
@@ -104,37 +104,37 @@ jobs:
 
     steps:
       - name: No-op deploy for changelog PR
-        if: ${{ env.IS_CHANGELOG_PR }}
+        if: ${{ fromJSON(env.IS_CHANGELOG_PR) }}
         run: echo "Changelog-only PR - skipping TestPyPI upload and smoke tests, but marking deployment as successful."
 
       - name: Download built distributions
-        if: ${{ !env.IS_CHANGELOG_PR }}
+        if: ${{ !fromJSON(env.IS_CHANGELOG_PR) }}
         uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
 
       - name: Upload package to TestPyPI
-        if: ${{ !env.IS_CHANGELOG_PR }}
+        if: ${{ !fromJSON(env.IS_CHANGELOG_PR) }}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
 
       - name: Set up Python for smoke test
-        if: ${{ !env.IS_CHANGELOG_PR }}
+        if: ${{ !fromJSON(env.IS_CHANGELOG_PR) }}
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Upgrade pip
-        if: ${{ !env.IS_CHANGELOG_PR }}
+        if: ${{ !fromJSON(env.IS_CHANGELOG_PR) }}
         run: |
           python -m pip install --upgrade pip
 
         # Retries are needed since the upload to Test PyPI might not have been indexed yet after
         # the upload in the previous step.
       - name: Install rag-bencher for testing
-        if: ${{ !env.IS_CHANGELOG_PR }}
+        if: ${{ !fromJSON(env.IS_CHANGELOG_PR) }}
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 10
@@ -145,7 +145,7 @@ jobs:
           command: python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple rag-bencher
 
       - name: Smoke test CLI entrypoints (pip env)
-        if: ${{ !env.IS_CHANGELOG_PR }}
+        if: ${{ !fromJSON(env.IS_CHANGELOG_PR) }}
         run: |
           python -c "import rag_bencher; print('rag_bencher OK')"
           python -m rag_bencher.cli --help
